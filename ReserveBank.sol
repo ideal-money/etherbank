@@ -20,6 +20,8 @@ contract ReserveBank is Pausable {
     uint256 constant public MAX_LOAN_FEE_RATION = 10; // 0.01 * PRECISION_POINT or 1%
 
     address public ourOracle;
+    address public liquidatorAdd;
+    address public etherDollarAdd;
     uint256 public loanFeeRatio;
     uint64 public lastLoanId;
     uint256 public depositRate;
@@ -44,10 +46,10 @@ contract ReserveBank is Pausable {
 
     mapping(uint64 => Loan) private loans;
 
-    event bestBid(address borrower, uint256 collateralAmount, uint256 amount, uint64 loanId);
+    event LogGet(address borrower, uint256 collateralAmount, uint256 amount, uint64 loanId);
     event LogSettle(address borrower, uint256 collateralAmount, uint256 amount, uint64 loanId);
 
-    constructor(address _token)
+    constructor()
         public {
             owner = msg.sender;
             ourOracle = 0x0;
@@ -73,8 +75,9 @@ contract ReserveBank is Pausable {
         onlyOwner
     {
         require(_liquidatorAdd != address(0));
+
         liquidatorAdd = _liquidatorAdd;
-        liquidator = ReserveBank(liquidatorAdd);
+        liquidator = Liquidator(liquidatorAdd);
     }
 
     /**
@@ -86,6 +89,7 @@ contract ReserveBank is Pausable {
         onlyOwner
     {
         require(_etherDollarAdd != address(0));
+
         etherDollarAdd = _etherDollarAdd;
         token = EtherDollar(etherDollarAdd);
     }
@@ -123,7 +127,7 @@ contract ReserveBank is Pausable {
      * @param _etherDollarPrice The price of etherDollar in the market.
      */
     function setVariables(uint256 _depositRate, uint256 _etherPrice, uint256 _etherDollarPrice, uint256 _numberOfBlocks)
-        external
+        public
         onlyOurOracle
         throwIfEqualToZero(_etherPrice)
         throwIfEqualToZero(_etherDollarPrice)
@@ -133,7 +137,7 @@ contract ReserveBank is Pausable {
         depositRate = _depositRate;
         etherPrice = _etherPrice;
         etherDollarPrice = _etherDollarPrice;
-        numberOfBlocks = _numberOfBlocks
+        numberOfBlocks = _numberOfBlocks;
     }
 
     /**
@@ -170,9 +174,7 @@ contract ReserveBank is Pausable {
         throwIfEqualToZero(amount)
     {
         require(amount <= token.allowance(loans[loanId].debtor, this));
-
         require(amount <= loans[loanId].amount);
-
         require(loans[loanId].state == LoanState.ACTIVE);
 
         uint256 paybackAmount = (loans[loanId].collateralAmount.mul(amount)).div(loans[loanId].amount);
@@ -201,7 +203,7 @@ contract ReserveBank is Pausable {
             loanId,
             loans[loanId].collateralAmount,
             loans[loanId].amount
-        )
+        );
     }
 
     /**
@@ -211,7 +213,7 @@ contract ReserveBank is Pausable {
      * @param bestBidder The winner account.
      */
     function payBestBidderEther(uint64 loanId, uint256 bestBid, address bestBidder)
-        internal
+        public
         whenNotPaused
     {
         loans[loanId].state = LoanState.LIQUIDATED;
