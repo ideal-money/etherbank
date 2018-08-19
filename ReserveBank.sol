@@ -126,7 +126,7 @@ contract ReserveBank is Pausable {
      * @param _etherPrice The price of ether in the market.
      * @param _etherDollarPrice The price of etherDollar in the market.
      */
-    function setVariables(uint256 _depositRate, uint256 _etherPrice, uint256 _etherDollarPrice, uint256 _numberOfBlocks)
+    function setVariables(uint256 _depositRate, uint256 _etherPrice, uint256 _etherDollarPrice)
         public
         onlyOurOracle
         throwIfEqualToZero(_etherPrice)
