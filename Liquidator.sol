@@ -1,18 +1,17 @@
 pragma solidity ^0.4.22;
 
 import "./openzeppelin/lifecycle/Pausable.sol";
-import "./token/EtherDollar.sol";
+import "./token/LoanableToken.sol";
 import "./ReserveBank.sol";
 
 
 contract Liquidator is Pausable {
     using SafeMath for uint256;
-    EtherDollar public token;
+    LoanableToken public token;
     ReserveBank public bank;
 
     address public owner;
     address public reserveBankAdd;
-    address public etherDollarAdd;
     uint64 public lastLiquidationId;
 
     enum LiquidationState {
@@ -37,14 +36,12 @@ contract Liquidator is Pausable {
 
     event LogStartLiquidation(uint64 liquidationId, uint256 collateralAmount, uint256 loanAmount, uint256 startBlock, uint256 endBlock);
     event LogStopLiquidation(uint64 liquidationId, uint256 bestBid, address bestBidder);
-    event LogDeposit(address depositorAccount, uint256 amount);
     event LogWithdraw(address withdrawalAccount, uint256 amount);
 
     constructor()
         public {
             owner = msg.sender;
             reserveBankAdd = 0x0;
-            etherDollarAdd = 0x0;
             lastLiquidationId = 0;
         }
 
@@ -66,29 +63,13 @@ contract Liquidator is Pausable {
      * @dev Set EtherDollar smart contract address.
      * @param _etherDollarAdd The EtherDollar smart contract address.
      */
-    function setEtherDollar(address _etherDollarAdd)
+    function setEtherDollar(address _tokenAdd)
         external
         onlyOwner
         whenNotPaused
     {
-        require(_etherDollarAdd != address(0));
-        etherDollarAdd = _etherDollarAdd;
-        token = EtherDollar(etherDollarAdd);
-    }
-
-    /**
-     * @dev Deposit EtherDollar.
-     * @param depositor The address which deposite EtherDollar.
-     * @param amount The deposite amount.
-     */
-    function deposit(address depositor, uint256 amount)
-        public
-        onlyEtherDollarSC
-        whenNotPaused
-        throwIfEqualToZero(amount)
-    {
-        deposits[depositor] += amount;
-        emit LogDeposit(depositor, amount);
+        require(_tokenAdd != address(0));
+        token = LoanableToken(_tokenAdd);
     }
 
     /**
@@ -114,7 +95,7 @@ contract Liquidator is Pausable {
     {
         require(amount <= deposits[msg.sender]);
         deposits[msg.sender] -= amount;
-        token.transferFrom(this, msg.sender, amount); //??????
+        token.transfer(msg.sender, amount);
         emit LogWithdraw(msg.sender, amount);
     }
 
@@ -140,14 +121,14 @@ contract Liquidator is Pausable {
     {
         uint256 startBlock = block.number;
         uint256 endBlock = startBlock.add(_numberOfBlocks);
-        lastLiquidationId++;
-        liquidations[lastLiquidationId].loanId = _loanId;
-        liquidations[lastLiquidationId].collateralAmount = _collateralAmount;
-        liquidations[lastLiquidationId].loanAmount = _loanAmount;
-        liquidations[lastLiquidationId].startBlock = startBlock;
-        liquidations[lastLiquidationId].endBlock = endBlock;
-        liquidations[lastLiquidationId].state = LiquidationState.ACTIVE;
-        emit LogStartLiquidation(lastLiquidationId, _collateralAmount, _loanAmount, startBlock, endBlock);
+        uint64 liquidationId = ++lastLiquidationId;
+        liquidations[liquidationId].loanId = _loanId;
+        liquidations[liquidationId].collateralAmount = _collateralAmount;
+        liquidations[liquidationId].loanAmount = _loanAmount;
+        liquidations[liquidationId].startBlock = startBlock;
+        liquidations[liquidationId].endBlock = endBlock;
+        liquidations[liquidationId].state = LiquidationState.ACTIVE;
+        emit LogStartLiquidation(liquidationId, _collateralAmount, _loanAmount, startBlock, endBlock);
     }
 
     /**
@@ -163,7 +144,7 @@ contract Liquidator is Pausable {
         require(liquidations[liquidationId].bestBid != 0);
         liquidations[liquidationId].state = LiquidationState.FINISHED;
         token.burn(liquidations[liquidationId].loanAmount);
-        bank.payBestBidderEther(
+        bank.liquidated(
             liquidations[liquidationId].loanId,
             liquidations[liquidationId].bestBid,
             liquidations[liquidationId].bestBidder
@@ -180,7 +161,9 @@ contract Liquidator is Pausable {
         whenNotPaused
         checkLiquidationState(liquidationId, LiquidationState.ACTIVE)
     {
-        require(deposits[msg.sender] >= liquidations[liquidationId].loanAmount);
+        require(liquidations[liquidationId].loanAmount <= token.allowance(msg.sender, this));
+        token.transferFrom(msg.sender, this, liquidations[liquidationId].loanAmount);
+        deposits[msg.sender] += liquidations[liquidationId].loanAmount;
         require(bidAmount < liquidations[liquidationId].bestBid);
         deposits[liquidations[liquidationId].bestBidder] += liquidations[liquidationId].loanAmount;
         deposits[msg.sender] -= liquidations[liquidationId].loanAmount;
@@ -203,14 +186,6 @@ contract Liquidator is Pausable {
     }
 
     /**
-     * @dev Throws if called by any account other than owner.
-     */
-    modifier onlyOwner {
-        require(msg.sender == owner);
-        _;
-    }
-
-    /**
      * @dev Throws if state is not equal to needState.
      * @param liquidationId The id of the liquidation.
      * @param needState The state which needed.
@@ -226,14 +201,6 @@ contract Liquidator is Pausable {
      */
     modifier throwIfEqualToZero(uint number) {
         require(number != 0);
-        _;
-    }
-
-    /**
-     * @dev Throws if called by any account other than our EtherDollar smart conrtact.
-     */
-    modifier onlyEtherDollarSC() {
-        require(msg.sender == etherDollarAdd);
         _;
     }
 
