@@ -25,7 +25,7 @@
 * Loan receivers are obliged to pay the interest that is assigned to their loan on a daily basis at least once a week. Otherwise, their loan will be liquidated.
 * There is no obligation or time limit to settle the loans in Auto-Interest Bank. Clients can settle their loans whenever they intend to unless liquidation is applicable for them.
 * DIR will be defined and paid in EtherDollar rather than Ether. This way, delays in paying the interest won’t increase or decrease their worth.
-* At any point in time before the end of their deposit period, the depositors can receive all their share of the interest by performing a single transaction.
+* At any point in time before the end of their deposit period, the depositors can receive all their share of the interest by performing a single transaction<sup>[4](#footnote4)</sup>.
 * Auto-Interest Bank intends to use the interest to quickly and effectively balance the supply and demand for Auto-Interest Bank Dollars.
 # Time-Based Bank
 * Every client can receive EtherDollar loans from Time-Based Bank by making a deposit of at least 3 times the size of their requested loan as collateral. 
@@ -43,3 +43,5 @@
 This approach will create a huge amount of demand from those who own Ether and can provide them as collateral to receive free loans. But the loans are limited in Reserve Bank, because, every time the demand for receiving free loans from Reserve Bank exceeds the demand for holding Reserve Bank Dollars, the price of Reserve Bank Dollars will fall below 1 EtherDollar in the market.
 In these circumstances, in order to reduce its supply, Reserve Bank will forcibly settle the loans with the lowest amount of collateral by liquidating them. This will create a competition among loan receivers not to have lower amounts of collateral than others. This competition will increase the collateral needed for receiving loans to an extent where the demand for receiving loans reaches the demand for holding Reserve Bank Dollars.
 Reserve Bank never prohibits loans with collaterals equal to or slightly higher than 1.5 times their amount. However, every time these loans have the lowest amount of collateral compared to others, and the price for Reserve Bank Dollars is less than 1 EtherDollar, they will be instantly liquidated with some loss for the loan receivers and some benefit for the settlers.
+
+<a name="footnote4">4)</a> <sup>In fact, Auto-Interest Bank can only pay the interest share of depositors up until a week before this transaction because some loan receivers might have not paid their 7 day interest yet and calculating the last 7 days will not be completed. 
