@@ -1,6 +1,6 @@
 # ReserveBank
 * Every client can receive EtherDollar loans from Reserve Bank by making a deposit of at least 1.5 times the size of their requested loan as collateral.
-* The loans with collaterals that are worth less than 1.5 times the value of the loan due to Ether market prices will be liquidated<sup>[1](#footnote1)</sup>.
+* The loans with collaterals that are worth less than 1.5 times the value of the loan due to Ether market prices will be liquidated<sup>[1](#footnote1)</sup>.<sup>[2](#footnote2)</sup>
 * Every time the price of Reserve Bank Dollar is less than 1 EtherDollar, in addition to the loans with collaterals worth less than 1.5 times the value of the loan, other loans with the lowest amount of collateral will also be liquidated. 
 * There is no obligation or time limit to settle the loans in Reserve Bank. Clients can settle their loans whenever they intend to unless liquidation is applicable for them.
 * Reserve Bank’s design intends to maximize the collaterals deposited by loan receivers.
@@ -35,4 +35,5 @@
 * The daily interest rate for loans with 1day settlement due is called the basic DIR. Other DIRs for loans with longer settlement dues will be calculated as multiplication of the basic DIR.  
 * The basic DIR will be assigned dynamically relative to the price of Time-Based Bank Dollars in the market. The minimum basic DIR is zero.
 
-<a name="footnote1">1)</a> <sup>Liquidation means that EtherBank puts the loan’s collateral for sale. This way everyone can settle the loan on behalf of the receiver and win a part of his collateral. In other words, everyone can buy loan receiver’s collaterals by paying EtherDollars. After the sale, the remaining of the collateral will be paid back to the loan receiver and the EtherDollars will be eliminated by EtherBank. Because the price for liquidation is determined in the market, those who buy a part of the collateral to settle the loan will benefit to some extend and those whose loans are settled by others will lose to some extend.</sup>
+<a name="footnote1">1)</a> <sup>Liquidation means that EtherBank puts the loan’s collateral for sale. This way everyone can settle the loan on behalf of the receiver and win a part of his collateral. In other words, everyone can buy loan receiver’s collaterals by paying EtherDollars. After the sale, the remaining of the collateral will be paid back to the loan receiver and the EtherDollars will be eliminated by EtherBank. Because the price for liquidation is determined in the market, those who buy a part of the collateral to settle the loan will benefit to some extend and those whose loans are settled by others will lose to some extend.
+<a name="footnote2">2)</a> <sup>Due to volatility of Ether, loan receivers have to make deposits worth more than 1.5 times the amount of their loans and, add to their loan collateral in case Ether price decreases.
