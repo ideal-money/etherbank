@@ -35,6 +35,8 @@
 * The daily interest rate for loans with 1day settlement due is called the basic DIR. Other DIRs for loans with longer settlement dues will be calculated as multiplication of the basic DIR.  
 * The basic DIR will be assigned dynamically relative to the price of Time-Based Bank Dollars in the market. The minimum basic DIR is zero.
 
+
+--------------------------------------------------------------------------------------------------------------------------------------
 <sup><a name="footnote1">1)</a>Liquidation means that EtherBank puts the loan’s collateral for sale. This way everyone can settle the loan on behalf of the receiver and win a part of his collateral. In other words, everyone can buy loan receiver’s collaterals by paying EtherDollars. After the sale, the remaining of the collateral will be paid back to the loan receiver and the EtherDollars will be eliminated by EtherBank. Because the price for liquidation is determined in the market, those who buy a part of the collateral to settle the loan will benefit to some extend and those whose loans are settled by others will lose to some extend.
   
 <sup><a name="footnote2">2)</a>Due to volatility of Ether, loan receivers have to make deposits worth more than 1.5 times the amount of their loans and, add to their loan collateral in case Ether price decreases.
