@@ -1,4 +1,4 @@
-# ReserveBank
+# Reserve Bank
 * Every client can receive EtherDollar loans from Reserve Bank by making a deposit of at least 1.5 times the size of their requested loan as collateral.
 * The loans with collaterals that are worth less than 1.5 times the value of the loan due to Ether market prices will be liquidated<sup>[1](#footnote1)</sup>.<sup>[2](#footnote2)</sup>
 * Every time the price of Reserve Bank Dollar is less than 1 EtherDollar, in addition to the loans with collaterals worth less than 1.5 times the value of the loan, other loans with the lowest amount of collateral will also be liquidated. 
