@@ -1,49 +1,52 @@
-# Reserve Bank
-* Every client can receive EtherDollar loans from Reserve Bank by making a deposit of at least 1.5 times the size of their requested loan as collateral.
-* The loans with collaterals that are worth less than 1.5 times the value of the loan due to Ether market prices will be liquidated<sup>[1](#footnote1)</sup>.<sup>[2](#footnote2)</sup>
-* Every time the price of Reserve Bank Dollar is less than 1 EtherDollar, in addition to the loans with collaterals worth less than 1.5 times the value of the loan, other loans with the lowest amount of collateral will also be liquidated. 
-* There is no obligation or time limit to settle the loans in Reserve Bank. Clients can settle their loans whenever they intend to unless liquidation is applicable for them.
-* Reserve Bank’s design intends to maximize the collaterals deposited by loan receivers<sup>[3](#footnote3)</sup>. 
-* The most significant risk for the money issued by EtherBanks is their collateral losing value to the extent that it is worth less than the loan. Maximizing the amount of collateral for receiving loans in Reserve Bank will highly reduce that risk.
-* The approach in Reserve Bank in providing its limited loans to users who offer the largest amount of collateral results into Reserve Bank Dollars being the most risk free tokens comparing to tokens created in other EtherBanks.
-# Interest Bank
-* Every client can receive EtherDollar loans from Interest Bank by making a deposit of at least 1.5 times the size of their requested loan as collateral. 
-* The loans with collaterals that are worth less than 1.5 times the value of the loan due to Ether market prices will be liquidated
-* The loans in Interest Bank have an interest that is determined by the loan receivers when they request a loan. This interest can be increased or decreased anytime at their demand.
-* Every time the price of Interest Bank Dollars is less than 1 EtherDollar,  in addition to the loans with collaterals worth less than 1.5 times the value of the loan, other loans with the lowest interest will also be liquidated. 
-* There is no obligation or time limit to settle the loans in Interest Bank. Clients can settle their loans whenever they intend to unless liquidation is applicable for them.
-* The interest paid by loan receivers will be distributed among those who hold Interest Bank Dollars.
-* Interest Bank’s design intends to maximize the amount of paid interest for the Interest Bank Dollar holders. This approach motivates more people to hold tokens and expands the market for Interest Bank Dollars.
-# Auto-Interest Bank
-* Every client can receive EtherDollar loans from Auto-Interest Bank by making a deposit of at least 1.5 times the size of their requested loan as collateral. 
-* The loans with collaterals that are worth less than 1.5 times the value of the loan due to Ether market prices will be liquidated
-* The loans in Auto-Interest Bank have daily interest rates which we call DIR.
-* DIR is assigned dynamically, daily and relative to price conditions of Auto-Interest Bank Dollars. Its lowest amount is zero.
-* When the price for a Auto-Interest Bank Dollar is less than 1 EtherDollar, DIR will increase gradually and vice versa, when the price for Auto-Interest Bank Dollar is equal or higher than 1 EtherDollar, DIR will decrease gradually until it reaches zero. The pace in which DIR increases or decreases is relative to the difference in EtherDollar and Auto-Interest Bank Dollar prices.
-* The interest that is assigned daily to the loans will be distributed among those who deposit their Auto-Interest Bank Dollars in Auto-Interest Bank in weekly, monthly, or annual periods. Depositing means locking the tokens in Auto-Interest Bank smart contract for a certain period of time.
-* The longer the period of time clients lock their tokens, the bigger portion of the interest they receive from daily interests. Each day, those who deposit monthly will enjoy a larger amount of interest than those who deposit weekly.
-* Loan receivers are obliged to pay the interest that is assigned to their loan on a daily basis at least once a week. Otherwise, their loan will be liquidated.
-* There is no obligation or time limit to settle the loans in Auto-Interest Bank. Clients can settle their loans whenever they intend to unless liquidation is applicable for them.
-* DIR will be defined and paid in EtherDollar rather than Ether. This way, delays in paying the interest won’t increase or decrease their worth.
-* At any point in time before the end of their deposit period, the depositors can receive all their share of the interest by performing a single transaction<sup>[4](#footnote4)</sup>.
-* Auto-Interest Bank intends to use the interest to quickly and effectively balance the supply and demand for Auto-Interest Bank Dollars.
-# Time-Based Bank
-* Every client can receive EtherDollar loans from Time-Based Bank by making a deposit of at least 3 times the size of their requested loan as collateral. 
-* The loans with collaterals that are worth less than 1.5 times the value of the loan due to Ether market prices will be liquidated
-* The loans in Time-Based Bank will be paid with 1day or 1month settlement dues.
-* Relative to the due time for settlement, the loans will have various daily interest rates or DIRs. The minimum DIR will be for 1day loans and the maximum DIR will be for loans which have 1 month settlement periods.
-* The daily interest rate for loans with 1day settlement due is called the basic DIR. Other DIRs for loans with longer settlement dues will be calculated as multiplication of the basic DIR.  
-* The basic DIR will be assigned dynamically relative to the price of Time-Based Bank Dollars in the market. The minimum basic DIR is zero.
+# Ether Dollar, The Ideal Money on Ethereum
 
+# What is Ether Dollar?
+* If you take Ethereum as an economically free state and Ether as its gold, then Ether dollar is the money in Ethereum state backed by its gold.
+* In the same way that Canadian dollar is the unit of account in Canada and Australian dollar is the unit of account in Australia, Ether dollar is the unit of account in Ethereum.
+* Ether dollar does not depreciate in accordance with the inflations in the United States. 1 Ether dollar is worth as much as the purchasing power of a US dollar in 2014 which was the year Ethereum network initiated. Since US dollar depreciated by 6% during 2014 and 2018, an Ether dollar is worth 1.06 US dollars in 2018.
+# How Does Ether Dollar Have a Fixed Value?
+* Ether dollar is issued by a smart contract called Ether Bank.
+* Ether Bank has a simple strategy for maintaining value. It creates Ether dollars to an extent that the supply is equal to the demand in the market. In other words, new Ether dollars are created when demand is increased and existing Ether dollars are eliminated when demand is decreased.
+* Unlike other Cryptoassets, newly created tokens are not awarded. They are rather issued as loans. The tokens are created by paying loans and eliminated by settling them.
+* Issuing new tokens by paying loans instead of awarding them enables Ether Bank to maintain the value of Ether dollar by eliminating some of the existing tokens when the demand for them decreases in the market. Elimination is done through settling some of the loans.
 
---------------------------------------------------------------------------------------------------------------------------------------
-<sup><a name="footnote1">1)</a>  Liquidation means that EtherBank puts the loan’s collateral for sale. This way everyone can settle the loan on behalf of the receiver and win a part of his collateral. In other words, everyone can buy loan receiver’s collaterals by paying EtherDollars. After the sale, the remaining of the collateral will be paid back to the loan receiver and the EtherDollars will be eliminated by EtherBank. Because the price for liquidation is determined in the market, those who buy a part of the collateral to settle the loan will benefit to some extend and those whose loans are settled by others will lose to some extend.
-  
-<sup><a name="footnote2">2)</a>  Due to volatility of Ether, loan receivers have to make deposits worth more than 1.5 times the amount of their loans and, add to their loan collateral in case Ether price decreases.
+| Cryptoassets | Ether dollar |
+| ------------ | ------------ |
+| Supply is a function of time | Supply is a function of demand |
+| They are created over time and can never be destroyed after being created | They are created when demand for holding them increases and destroyed when demand decreases |
+| Newly created tokens are awarded, so there is no way to destroy them after creation | Newly created tokens are paid as loans, so they can easily be destroyed by settlement |
+| When demand increases, their market is balanced by the rise of the price | When demand increases, their market is balanced by creation of new tokens |
+| When demand decreases, their market is balanced by the fall of the price | When demand decreases, their market is balanced by destruction of previously created tokens |
+| Supply is stable just like gold | Price is stable just like money |
 
-<sup><a name="footnote3">3)</a>  The loans in Reserve Bank are completely free and users pay no interest. There is also no time limitations for paying back the loan and users can settle their loans whenever they want to. The only requirement for receiving a loan is providing enough Ethers as collateral.
-This approach will create a huge amount of demand from those who own Ether and can provide them as collateral to receive free loans. But the loans are limited in Reserve Bank, because, every time the demand for receiving free loans from Reserve Bank exceeds the demand for holding Reserve Bank Dollars, the price of Reserve Bank Dollars will fall below 1 EtherDollar in the market.
-In these circumstances, in order to reduce its supply, Reserve Bank will forcibly settle the loans with the lowest amount of collateral by liquidating them. This will create a competition among loan receivers not to have lower amounts of collateral than others. This competition will increase the collateral needed for receiving loans to an extent where the demand for receiving loans reaches the demand for holding Reserve Bank Dollars.
-Reserve Bank never prohibits loans with collaterals equal to or slightly higher than 1.5 times their amount. However, every time these loans have the lowest amount of collateral compared to others, and the price for Reserve Bank Dollars is less than 1 EtherDollar, they will be instantly liquidated with some loss for the loan receivers and some benefit for the settlers.
+# How is Ether dollar Created or Eliminated?
+* Every client can receive Ether dollar loans from Ether Bank by making a deposit of at least 1.5 times the size of their requested loan in Ether as collateral.
+* The loans with collaterals that are worth less than 1.5 times the value of the loan according to Ether market prices will be liquidated.
+* Liquidation means that Ether Bank puts the loan’s collateral for sale. This way everyone can settle the loan on behalf of the receiver and win a part of their collateral. In other words, everyone can buy loan receiver’s collateral by paying Ether dollars. After the sale, the remains of the collateral are paid back to the loan receiver and the Ether dollars are eliminated by Ether Bank. 
+* The price for liquidation is determined in the market, so, those who buy a part of the collateral to settle the loan benefit to some extent and those whose loans are settled by others lose to some extent.
+* Due to volatility of Ether, loan receivers have to make deposits worth more than 1.5 times the amount of their loans and, add to their loan collateral in case Ether price decreases, otherwise their loans will face liquidation risk.
+* Every time the price of Ether dollar is less than its peg, in addition to the loans with collaterals worth less than 1.5 times the value of the loan, other loans with lower amounts of collateral compared to others are also liquidated. This causes Ether dollar supply to always be in coordination with its demand. This way, only Ether dollar loans with the highest amounts of  collateral remain. 
+* There is no obligation or time limit to settle the loans in Ether Bank. Clients can settle their loans whenever they intend to unless liquidation is applicable for them.
+* Ether Bank never prohibits loans with collaterals equal to or slightly higher than 1.5 times their amount. However, every time these loans have a lower amount of collateral compared to others, and the price of Ether dollars is less than its peg, they are instantly liquidated with some loss for the loan receivers and some benefit for the settlers.
+# How Does the Monetary Policy in Ether Dollar Minimize the Risk?
+* The most significant risk for collateral based stablecoins is their collateral losing value to the extent that it is worth less than the loan. Ether Bank’s monetary policy maximizes the collaterals deposited by loan receivers to minimize this risk.
+* The loans in Ether Bank are completely free and clients pay no interest. There is also no time limit for paying back the loan and clients can settle their loans whenever they want to. The only requirement for receiving a loan is providing enough Ethers as collateral. This approach creates a huge demand in those who own Ethers and can provide them as collateral to receive free loans.
+* But the loans are limited in Ether Bank, because, every time the demand for receiving free loans from Ether Bank exceeds the demand for holding Ether dollars, the price of Ether dollars falls and the peg breaks.
+* In these circumstances, in order to reduce Ether dollar supply, Ether Bank forcibly settles the loans with the lowest amount of collateral by liquidating them. This will create a competition among loan receivers not to have lower amounts of collateral compared to others. This competition increases the collateral needed for receiving loans to an extent where the demand for receiving loans is equal to the demand for holding Ether dollars.
+* Considering an interest paid by the loans receivers to Ether dollar holders could have been another approach for facing price falls. But, the monetary policy behind Ether dollar aims to minimize the risk rather than maximize the interest. What creates such interest is an increase in the risk. Increasing the amount of collateral instead of the interest rates results in Ether dollar enjoying minimum risk and maximum reliability as the most significant feature of an ideal money. This mechanism turns Ether dollar to an ideal money and unit of account in the Ethereum ecosystem.
+# How is Ether Dollar Better Than Other Kinds of Money?
+* Assets and money are both stores of value. Those who intend to maximize their profit, tend to store value in assets, while, others who intend to minimize risks, store value in money. So an ideal money is the one with minimum risk of losing its value. The advantage of Ether dollar over its competitors is its emphasis on minimizing the risk.
+# Lower Risk Compared to Dollar.
+* Unlike Federal Reserve Bank, Ether Bank automatically targets zero inflation through an immutable smart contract.
+* Banks do not ask for collateral when they create dollars by paying loans. Ether Bank on the other hand asks for a collateral that is worth much more than the loan in order to create Ether dollars.
+# Lower Risk Compared to Fiat-Backed Stablecoins.
+* Not only because it does not have counterparty risks, but also because it has lower risks than fiat money to begin with.  
+# Lower Risk Compared to Other Collateral Backed Stablecoins
+* Unlike other similar stablecoins, Ether Bank has a highly simple and intelligible approach in creating Ether dollars.
+* Unlike other similar stablecoins, Ether dollar is designed to have maximum amount of collateral for the loans, therefore, the default risk for loans in case collateral prices fall is minimized.. 
+# Disclaimer
+* This repository is created as the proof of concept for Ether Dollar to demonstrate how it can be created as the simplest and most reliable kind of money  on the Ethereum network.
 
-<sup><a name="footnote4">4)</a>  In fact, Auto-Interest Bank can only pay the interest share of depositors up until a week before this transaction because some loan receivers might have not paid their 7 day interest yet and calculating the last 7 days will not be completed. 
+* The source codes in this repository is highly experimental and under heavy development. Do not use it for anything security-critical yet. 
+
+* All usage is at your own risk!
