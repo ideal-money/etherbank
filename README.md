@@ -51,7 +51,7 @@ Assets and money are both stores of value. Those who intend to maximize their pr
 ### Lower Risk Compared to Fiat-Backed Stablecoins.
 * Not only because it does not have counterparty risks, but also because it has lower risks than fiat money to begin with.  
 
-### Lower Risk Compared to Other Crypto Backed Stablecoins
+### Lower Risk Compared to Other Crypto-Backed Stablecoins
 * Unlike other similar stablecoins, Ether Bank has a highly simple and intelligible approach in creating Ether dollars.
 * Unlike other similar stablecoins, Ether dollar is designed to have maximum amount of collateral for the loans, therefore, the default risk for loans in case collateral prices fall is minimized.. 
 
