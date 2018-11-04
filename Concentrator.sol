@@ -1,21 +1,21 @@
 pragma solidity ^0.4.22;
 
 import "./openzeppelin/lifecycle/Pausable.sol";
-import "./ReserveBank.sol";
-import "./Congress.sol";
+import "./EtherBank.sol";
+import "./Oracles.sol";
 
 
 contract Concentrator is Pausable {
     using SafeMath for uint256;
 
-    ReserveBank public bank;
-    Congress public congress;
+    EtherBank public bank;
+    Oracles public oracles;
     uint256 public max;
     uint256 public min;
     uint256 public sum;
     uint256 public sumScores;
     uint256 public votingNo;
-    uint256 public congressSize;
+    uint256 public totalScore;
     uint8 public type;
     address public owner;
     // type {
@@ -32,7 +32,7 @@ contract Concentrator is Pausable {
 
     mapping(address => Ballot) private ballotBox;
 
-    event LogBallot(address congressman, uint256 etherPrice, uint256 loanFeeRatio, uint256 depositRate);
+    event LogBallot(address oracle, uint256 etherPrice, uint256 loanFeeRatio, uint256 depositRate);
     event LogUpdate(uint256 depositRate, uint256 etherPrice, uint256 loanFeeRatio);
 
     constructor(uint256 _min, uint256 _max, uint8 _type)
@@ -47,41 +47,41 @@ contract Concentrator is Pausable {
         }
 
     /**
-     * @dev Set Congress smart contract.
-     * @param _congressAdd The CryptoCongress smart contract address.
+     * @dev Set Oracles smart contract.
+     * @param _address The Oracles smart contract address.
      */
-    function setCongress(address _congressAdd)
+    function setOracles(address _address)
         external
         onlyOwner
         whenNotPaused
     {
-        require(_congressAdd != address(0));
+        require(_address != address(0));
 
-        congress = Congress(_congressAdd);
+        oracles = Oracles(_address);
     }
 
     /**
-     * @dev Set ReserveBank smart contract.
-     * @param _reserveBankAdd The ReserveBank smart contract address.
+     * @dev Set EtherBank smart contract.
+     * @param _EtherBankAdd The EtherBank smart contract address.
      */
-    function setReserveBank(address _reserveBankAdd)
+    function setEtherBank(address _EtherBankAdd)
         external
         onlyOwner
         whenNotPaused
     {
-        require(_reserveBankAdd != address(0));
+        require(_EtherBankAdd != address(0));
 
-        bank = ReserveBank(_reserveBankAdd);
+        bank = EtherBank(_EtherBankAdd);
     }
 
     /**
-     * @dev Set Congress size.
+     * @dev Set Oracles size.
      */
-    function setCongressSize()
+    function loadTotalScore()
         external
         whenNotPaused
     {
-        congressSize = congress.getCongressSize();
+        totalScore = oracles.getTotalScore();
     }
 
     /**
@@ -91,31 +91,31 @@ contract Concentrator is Pausable {
     function balloting(uint256 _value)
         public
         whenNotPaused
-        onlyCongressmans
+        onlyOracles
         throwIfEqualToZero(_value)
     {
         require(min <= _value && _value <= max);
 
-        address congressman = msg.sender;
-        uint256 score = congress.getScore(congressman);
-        if (ballotBox[congressman].votingNo == votingNo) {
-            sum -= ballotBox[congressman].value.mul(score);
+        address oracle = msg.sender;
+        uint256 score = oracles.getScore(oracle);
+        if (ballotBox[oracle].votingNo == votingNo) {
+            sum -= ballotBox[oracle].value.mul(score);
             sumScores -= score;
         }
-        ballotBox[congressman].value = _value;
-        ballotBox[congressman].votingNo = votingNo;
+        ballotBox[oracle].value = _value;
+        ballotBox[oracle].votingNo = votingNo;
         sum += _value.mul(score);
         sumScores += score;
-        if ((congressSize / sumScores) == 1) {
-            updateReserveBank();
+        if ((totalScore / sumScores) == 1) {
+            updateEtherBank();
         }
-        emit LogBallot(congressman, type, _value);
+        emit LogBallot(oracle, type, _value);
     }
 
     /**
-     * @dev Update the ReserveBank variable.
+     * @dev Update the EtherBank variable.
      */
-    function updateReserveBank()
+    function updateEtherBank()
     internal
     {
         calculatdValue = sum / sumScores;
@@ -127,10 +127,10 @@ contract Concentrator is Pausable {
     }
 
     /**
-     * @dev Throws if called by any account other than a congressman.
+     * @dev Throws if called by any account other than a oracle.
      */
-    modifier onlyCongressmans() {
-        uint256 score = congress.getScore(msg.sender);
+    modifier onlyOracles() {
+        uint256 score = oracles.getScore(msg.sender);
         require(score != 0);
         _;
     }

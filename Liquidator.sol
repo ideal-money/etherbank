@@ -1,17 +1,17 @@
 pragma solidity ^0.4.22;
 
 import "./openzeppelin/lifecycle/Pausable.sol";
-import "./token/LoanableToken.sol";
-import "./ReserveBank.sol";
+import "./EtherDollar.sol";
+import "./EtherBank.sol";
 
 
 contract Liquidator is Pausable {
     using SafeMath for uint256;
-    LoanableToken public token;
-    ReserveBank public bank;
+    EtherDollar public token;
+    EtherBank public bank;
 
     address public owner;
-    address public reserveBankAdd;
+    address public EtherBankAdd;
     uint64 public lastLiquidationId;
 
     enum LiquidationState {
@@ -41,22 +41,22 @@ contract Liquidator is Pausable {
     constructor()
         public {
             owner = msg.sender;
-            reserveBankAdd = 0x0;
+            EtherBankAdd = 0x0;
             lastLiquidationId = 0;
         }
 
     /**
-     * @dev Set ReserveBank smart contract address.
-     * @param _reserveBankAdd The ReserveBank smart contract address.
+     * @dev Set EtherBank smart contract address.
+     * @param _EtherBankAdd The EtherBank smart contract address.
      */
-    function setReserveBank(address _reserveBankAdd)
+    function setEtherBank(address _EtherBankAdd)
         external
         onlyOwner
         whenNotPaused
     {
-        require(_reserveBankAdd != address(0));
-        reserveBankAdd = _reserveBankAdd;
-        bank = ReserveBank(reserveBankAdd);
+        require(_EtherBankAdd != address(0));
+        EtherBankAdd = _EtherBankAdd;
+        bank = EtherBank(EtherBankAdd);
     }
 
     /**
@@ -69,7 +69,7 @@ contract Liquidator is Pausable {
         whenNotPaused
     {
         require(_tokenAdd != address(0));
-        token = LoanableToken(_tokenAdd);
+        token = EtherDollar(_tokenAdd);
     }
 
     /**
@@ -114,7 +114,7 @@ contract Liquidator is Pausable {
     )
         public
         whenNotPaused
-        onlyReserveBankSC
+        onlyEtherBankSC
         throwIfEqualToZero(_collateralAmount)
         throwIfEqualToZero(_loanAmount)
         throwIfEqualToZero(_numberOfBlocks)
@@ -205,10 +205,10 @@ contract Liquidator is Pausable {
     }
 
     /**
-     * @dev Throws if called by any account other than our ReserveBank smart conrtact.
+     * @dev Throws if called by any account other than our EtherBank smart conrtact.
      */
-    modifier onlyReserveBankSC() {
-        require(msg.sender == reserveBankAdd);
+    modifier onlyEtherBankSC() {
+        require(msg.sender == EtherBankAdd);
         _;
     }
 }

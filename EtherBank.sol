@@ -2,14 +2,14 @@ pragma solidity ^0.4.22;
 
 import "./openzeppelin/math/SafeMath.sol";
 import "./openzeppelin/lifecycle/Pausable.sol";
-import "./token/LoanableToken.sol";
+import "./EtherDollar.sol";
 import "./Liquidator.sol";
 
 
-contract ReserveBank is Pausable {
+contract EtherBank is Pausable {
 
     using SafeMath for uint256;
-    LoanableToken public token;
+    EtherDollar public token;
     Liquidator public liquidator;
 
     uint256 constant public PRECISION_POINT = 10 ** 3;
@@ -91,7 +91,7 @@ contract ReserveBank is Pausable {
     {
         require(_tokenAdd != address(0));
 
-        token = LoanableToken(_tokenAdd);
+        token = EtherDollar(_tokenAdd);
     }
 
     /**
