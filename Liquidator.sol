@@ -1,12 +1,13 @@
 pragma solidity ^0.4.22;
 
-import "./openzeppelin/lifecycle/Pausable.sol";
+import "./openzeppelin/contracts/lifecycle/Pausable.sol";
 import "./EtherDollar.sol";
 import "./EtherBank.sol";
 
 
 contract Liquidator is Pausable {
     using SafeMath for uint256;
+
     EtherDollar public token;
     EtherBank public bank;
 
@@ -61,7 +62,7 @@ contract Liquidator is Pausable {
 
     /**
      * @dev Set EtherDollar smart contract address.
-     * @param _etherDollarAdd The EtherDollar smart contract address.
+     * @param _tokenAdd The EtherDollar smart contract address.
      */
     function setEtherDollar(address _tokenAdd)
         external

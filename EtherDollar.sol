@@ -1,8 +1,9 @@
 pragma solidity ^0.4.18;
 
-import "../openzeppelin/token/MintableToken.sol";
-import "../openzeppelin/token/BurnableToken.sol";
-import "../openzeppelin/ownership/Claimable.sol";
+import "./openzeppelin/contracts/token/MintableToken.sol";
+import "./openzeppelin/contracts/token/BurnableToken.sol";
+import "./openzeppelin/contracts/ownership/Claimable.sol";
+
 
 /**
  * @title EtherDollar token contract.

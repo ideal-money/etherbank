@@ -1,24 +1,44 @@
 pragma solidity ^0.4.22;
 
-import "./openzeppelin/lifecycle/Pausable.sol";
+import "./openzeppelin/contracts/lifecycle/Pausable.sol";
+import "./openzeppelin/contracts/math/SafeMath.sol";
+import "./EtherBank.sol";
 
 
 contract Oracles is Pausable {
+    using SafeMath for uint256;
+
+    EtherBank public bank;
+
     address public owner;
     bool public recruitingFinished = false;
-    uint64 public totalScore;
+    uint256 public totalScore;
 
-    struct oracle {
+    struct Vote {
+        uint256 value;
+        uint256 votingNo;
+    }
+
+    struct Voting {
+        uint256 sum;
+        uint256 sumScores;
+        uint256 No;
+    }
+
+    struct Oracle {
         address account;
         uint64 score;
         bool isActive;
     }
 
-    mapping(address => oracle) private oracles;
+    mapping(bytes32 => Vote) private votes;
+    mapping(uint8 => Voting) private votings;
+    mapping(address => Oracle) private oracles;
 
     event LogEditOracles(address oracle, uint256 score);
     event LogFinishRecruiting();
-
+    event LogVote(address oracle, uint8 _type, uint256 _value);
+    event LogUpdate(uint8 _type, uint256 _value);
 
     constructor()
         public {
@@ -27,9 +47,67 @@ contract Oracles is Pausable {
         }
 
     /**
+     * @dev Set EtherBank smart contract.
+     * @param _EtherBankAdd The EtherBank smart contract address.
+     */
+    function setEtherBank(address _EtherBankAdd)
+        external
+        onlyOwner
+        whenNotPaused
+    {
+        require(_EtherBankAdd != address(0));
+
+        bank = EtherBank(_EtherBankAdd);
+    }
+
+    /**
+     * @dev Sign a ballot.
+     * @param _value The value of a variable.
+     * @param _type The variable code.
+     */
+    function vote(uint8 _type, uint256 _value)
+        public
+        whenNotPaused
+    {
+        address oracle = msg.sender;
+        uint256 score = oracles[oracle].score;
+        bytes32 votesKey = keccak256(abi.encodePacked(oracle,_type));
+        if (votings[_type].No == 0) {
+            votings[_type].No++;
+        }
+        if (votes[votesKey].votingNo == votings[_type].No) {
+            votings[_type].sum -= votes[votesKey].value.mul(score);
+            votings[_type].sumScores -= score;
+        }
+        votes[votesKey].value = _value;
+        votes[votesKey].votingNo = votings[_type].No;
+        votings[_type].sum += (_value.mul(score));
+        votings[_type].sumScores += score;
+        if ((totalScore / votings[_type].sumScores) < 2) {
+            updateEtherBank(_type);
+        }
+        emit LogVote(oracle, _type, _value);
+    }
+
+    /**
+     * @dev Update the EtherBank variable.
+     * @param _type The variable code.
+     */
+    function updateEtherBank(uint8 _type)
+    internal
+    {
+        uint256 _value = votings[_type].sum / votings[_type].sumScores;
+        bank.setVariable(_type, _value);
+        votings[_type].sum = 0;
+        votings[_type].sumScores = 0;
+        votings[_type].No++;
+        emit LogUpdate(_type, _value);
+    }
+
+    /**
      * @dev Manipulate (add/remove/edit score) member of oracles.
      * @param _account The oracle account.
-     * @param _account The score of oracle.
+     * @param _score The score of oracle.
      */
     function edit(address _account, uint64 _score)
         external
@@ -53,31 +131,6 @@ contract Oracles is Pausable {
             totalScore -= _score;
         }
         emit LogEditOracles(_account, _score);
-    }
-
-    /**
-     * @dev Get score of the oracle.
-     * @param account The account of the oracle.
-     */
-    function getScore(address account)
-        public
-        view
-        whenNotPaused
-        returns(uint64)
-    {
-        return oracles[oracle].score;
-    }
-
-    /**
-     * @dev Get total oracles' scores.
-     */
-    function getTotalScore()
-        public
-        view
-        whenNotPaused
-        returns(uint64)
-    {
-        return totalScore;
     }
 
     /**

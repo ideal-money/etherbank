@@ -1,14 +1,14 @@
 pragma solidity ^0.4.22;
 
-import "./openzeppelin/math/SafeMath.sol";
-import "./openzeppelin/lifecycle/Pausable.sol";
+import "./openzeppelin/contracts/math/SafeMath.sol";
+import "./openzeppelin/contracts/lifecycle/Pausable.sol";
 import "./EtherDollar.sol";
 import "./Liquidator.sol";
 
 
 contract EtherBank is Pausable {
-
     using SafeMath for uint256;
+
     EtherDollar public token;
     Liquidator public liquidator;
 
@@ -83,7 +83,7 @@ contract EtherBank is Pausable {
 
     /**
      * @dev Set EtherDollar smart contract address.
-     * @param _etherDollarAdd The EtherDollar smart contract address.
+     * @param _tokenAdd The EtherDollar smart contract address.
      */
     function setEtherDollar(address _tokenAdd)
         external
@@ -109,20 +109,20 @@ contract EtherBank is Pausable {
 
     /**
      * @dev Lets Concentrator to set important varibales.
-     * @param type Code of the variable.
+     * @param _type Code of the variable.
      * @param value Amount of the variable.
      */
-    function setVariable(uint256 type, uint256 value)
+    function setVariable(uint256 _type, uint256 value)
         public
         onlyConcentrator
     {
-        if (uint(Type.ETHER_PRICE) == type) {
+        if (uint(Types.ETHER_PRICE) == _type) {
             etherPrice = value;
-        } else if (uint(Type.DEPOSIT_RATE) == type) {
+        } else if (uint(Types.DEPOSIT_RATE) == _type) {
             depositRate = value;
-        } else if (uint(Type.LOAN_FEE_RATIO) == type) {
+        } else if (uint(Types.LOAN_FEE_RATIO) == _type) {
             loanFeeRatio = value;
-        } else if (uint(Type.LIQUIDATION_DURATION) == type) {
+        } else if (uint(Types.LIQUIDATION_DURATION) == _type) {
             liquidationDuration = value;
         }
     }
