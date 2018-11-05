@@ -42,7 +42,7 @@
 * Considering an interest paid by the loans receivers to Ether dollar holders could have been another approach for facing price falls. But, the monetary policy behind Ether dollar aims to minimize the risk rather than maximize the interest. What creates such interest is an increase in the risk. Increasing the amount of collateral instead of the interest rates results in Ether dollar enjoying minimum risk and maximum reliability as the most significant feature of an ideal money. This mechanism turns Ether dollar to an ideal money and unit of account in the Ethereum ecosystem.
 
 ## How is Ether Dollar Better Than Other Kinds of Money?
-* Assets and money are both stores of value. Those who intend to maximize their profit, tend to store value in assets, while, others who intend to minimize risks, store value in money. So an ideal money is the one with minimum risk of losing its value. The advantage of Ether dollar over its competitors is its emphasis on minimizing the risk.
+Assets and money are both stores of value. Those who intend to maximize their profit, tend to store value in assets, while, others who intend to minimize risks, store value in money. So an ideal money is the one with minimum risk of losing its value. The advantage of Ether dollar over its competitors is its emphasis on minimizing the risk.
 
 ### Lower Risk Compared to Dollar.
 * Unlike Federal Reserve Bank, Ether Bank automatically targets zero inflation through an immutable smart contract.
@@ -51,13 +51,13 @@
 ### Lower Risk Compared to Fiat-Backed Stablecoins.
 * Not only because it does not have counterparty risks, but also because it has lower risks than fiat money to begin with.  
 
-### Lower Risk Compared to Other Collateral Backed Stablecoins
+### Lower Risk Compared to Other Crypto-Backed Stablecoins
 * Unlike other similar stablecoins, Ether Bank has a highly simple and intelligible approach in creating Ether dollars.
 * Unlike other similar stablecoins, Ether dollar is designed to have maximum amount of collateral for the loans, therefore, the default risk for loans in case collateral prices fall is minimized.. 
 
 ## Disclaimer
-* This repository is created as the proof of concept for Ether Dollar to demonstrate how it can be created as the simplest and most reliable kind of money  on the Ethereum network.
+This repository is created as the proof of concept for Ether Dollar to demonstrate how it can be created as the simplest and most reliable kind of money  on the Ethereum network.
 
-* The source codes in this repository is highly experimental and under heavy development. Do not use it for anything security-critical yet. 
+The source codes in this repository is highly experimental and under heavy development. Do not use it for anything security-critical yet. 
 
-* All usage is at your own risk!
+All usage is at your own risk!
