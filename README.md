@@ -1,12 +1,12 @@
-# Ether Dollar, The Ideal Money on Ethereum
+# Ether Bank, Making Zero Interest Loans to Ether HOLDers
 
-## What is Ether Dollar?
-* If you take Ethereum as an economically free state and Ether as its gold, then Ether dollar is the money in Ethereum state backed by its gold.
-* In the same way that Canadian dollar is the unit of account in Canada and Australian dollar is the unit of account in Australia, Ether dollar is the unit of account in Ethereum.
+## What is Ether Bank?
+* Ether Bank is a smart contract that receives Ether as collateral and provides zero interest loans with no due payback time.  
+* Ether Bank helps Ether HODLers pay for their expenditures without having to sell their Ethers.
+* The loans are in form of Ether dollars that are stablecoins created by Ether Bank and backed by Ether.
 * Ether dollar does not depreciate in accordance with the inflations in the United States. 1 Ether dollar is worth as much as the purchasing power of a US dollar in 2014 which was the year Ethereum network initiated. Since US dollar depreciated by 6% during 2014 and 2018, an Ether dollar is worth 1.06 US dollars in 2018.
 
-## How Does Ether Dollar Have a Fixed Value?
-* Ether dollar is issued by a smart contract called Ether Bank.
+## How Does Ether Bank Ensures Stability of Ether Dollar?
 * Ether Bank has a simple strategy for maintaining value. It creates Ether dollars to an extent that the supply is equal to the demand in the market. In other words, new Ether dollars are created when demand is increased and existing Ether dollars are eliminated when demand is decreased.
 * Unlike other Cryptoassets, newly created tokens are not awarded. They are rather issued as loans. The tokens are created by paying loans and eliminated by settling them.
 * Issuing new tokens by paying loans instead of awarding them enables Ether Bank to maintain the value of Ether dollar by eliminating some of the existing tokens when the demand for them decreases in the market. Elimination is done through settling some of the loans.
