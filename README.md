@@ -2,7 +2,7 @@
 
 ### What is Ether Bank?
 * Ether Bank is a smart contract that receives Ether as collateral and provides zero interest loans with no due payback time.  
-* Ether Bank helps Ether HODLers pay for their expenditures without having to sell their Ethers.
+* Ether Bank loans helps Ether HODLers pay for their expenditures without having to sell their Ethers.
 * The loans are in form of Ether dollars that are stablecoins created by Ether Bank and backed by Ether.
 * Ether dollar does not depreciate in accordance with the inflations in the United States. 1 Ether dollar is worth as much as the purchasing power of a US dollar in 2014 which was the year Ethereum network initiated. Since US dollar depreciated by 6% during 2014 and 2018, an Ether dollar is worth 1.06 US dollars in 2018.
 
