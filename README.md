@@ -1,4 +1,5 @@
-# Ether Bank, Making Zero Interest Loans to Ether HOLDers
+# Ether Bank
+### Making Zero Interest Loans to Ether HOLDers
 
 ## What is Ether Bank?
 * Ether Bank is a smart contract that receives Ether as collateral and provides zero interest loans with no due payback time.  
