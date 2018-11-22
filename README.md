@@ -1,15 +1,13 @@
 ## Ether Bank, Making Zero Interest Loans for Ether HODLers
 
-Table of Contents
-=================
+### Table of Contents
 
-         * [What is Ether Bank?](#what-is-ether-bank)
-         * [How Does Ether Bank Ensures Stability of Ether Dollar?](#how-does-ether-bank-ensures-stability-of-ether-dollar)
-         * [How is Ether Dollar Created or Eliminated?](#how-is-ether-dollar-created-or-eliminated)
-         * [How is Ether Dollar different from other stablecoins?](#how-is-ether-dollar-different-from-other-stablecoins)
-         * [How Does the Monetary Policy in Ether Dollar Minimize the Risk?](#how-does-the-monetary-policy-in-ether-dollar-minimize-the-risk)
-         * [Disclaimer](#disclaimer)
-
+- [What is Ether Bank?](#what-is-ether-bank)
+- [How Does Ether Bank Ensures Stability of Ether Dollar?](#how-does-ether-bank-ensures-stability-of-ether-dollar)
+- [How is Ether Dollar Created or Eliminated?](#how-is-ether-dollar-created-or-eliminated)
+- [How is Ether Dollar different from other stablecoins?](#how-is-ether-dollar-different-from-other-stablecoins)
+- [How Does the Monetary Policy in Ether Dollar Minimize the Risk?](#how-does-the-monetary-policy-in-ether-dollar-minimize-the-risk)
+- [Disclaimer](#disclaimer)
 
 ### What is Ether Bank?
 * Ether Bank is a smart contract that receives Ether as collateral and provides zero interest loans with no due payback time.  
