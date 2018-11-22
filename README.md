@@ -1,5 +1,16 @@
 ## Ether Bank, Making Zero Interest Loans for Ether HODLers
 
+Table of Contents
+=================
+
+         * [What is Ether Bank?](#what-is-ether-bank)
+         * [How Does Ether Bank Ensures Stability of Ether Dollar?](#how-does-ether-bank-ensures-stability-of-ether-dollar)
+         * [How is Ether Dollar Created or Eliminated?](#how-is-ether-dollar-created-or-eliminated)
+         * [How is Ether Dollar different from other stablecoins?](#how-is-ether-dollar-different-from-other-stablecoins)
+         * [How Does the Monetary Policy in Ether Dollar Minimize the Risk?](#how-does-the-monetary-policy-in-ether-dollar-minimize-the-risk)
+         * [Disclaimer](#disclaimer)
+
+
 ### What is Ether Bank?
 * Ether Bank is a smart contract that receives Ether as collateral and provides zero interest loans with no due payback time.  
 * Ether Bank loans helps Ether HODLers pay for their expenditures without having to sell their Ethers.
@@ -51,19 +62,6 @@
 * Considering an interest paid by the loans receivers to Ether dollar holders could have been another approach for facing price falls. But, the monetary policy behind Ether dollar aims to minimize the risk rather than maximize the interest. What creates such interest is an increase in the risk. 
 * Increasing the amount of collateral instead of the interest rates results in Ether dollar enjoying minimum risk and maximum reliability as the most significant feature of an ideal money. This mechanism turns Ether dollar to an ideal money and unit of account in the Ethereum ecosystem.
 
-### How does Ether Dollar Enjoy Lower Risks Compared to Other Kinds of Money?
-Assets and money are both stores of value. Those who intend to maximize their profit, tend to store value in assets, while, others who intend to minimize risks, store value in money. So an ideal money is the one with minimum risk of losing its value. The advantage of Ether dollar over its competitors is its emphasis on minimizing the risk.
-
-#### Lower Risk Compared to Dollar.
-* Unlike Federal Reserve Bank, Ether Bank automatically targets zero inflation through an immutable smart contract.
-* Banks do not ask for collateral when they create dollars by paying loans. Ether Bank on the other hand asks for a collateral that is worth much more than the loan in order to create Ether dollars.
-
-#### Lower Risk Compared to Fiat-Backed Stablecoins.
-* Not only because it does not have counterparty risks, but also because it has lower risks than fiat money to begin with.  
-
-#### Lower Risk Compared to Other Crypto-Backed Stablecoins
-* Unlike other similar stablecoins, Ether Bank has a highly simple and intelligible approach in creating Ether dollars.
-* Unlike other similar stablecoins, Ether dollar is designed to have maximum amount of collateral for the loans, therefore, the default risk for loans in case collateral prices fall is minimized.
 
 ### Disclaimer
 This repository is created as the proof of concept for Ether Dollar to demonstrate how it can be created as the simplest and most reliable kind of money  on the Ethereum network.
