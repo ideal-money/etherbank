@@ -5,8 +5,8 @@
 - [What is Ether Bank?](#what-is-ether-bank)
 - [How Does Ether Bank Ensures Stability of Ether Dollar?](#how-does-ether-bank-ensures-stability-of-ether-dollar)
 - [How is Ether Dollar Created or Eliminated?](#how-is-ether-dollar-created-or-eliminated)
-- [How is Ether Dollar different from other stablecoins?](#how-is-ether-dollar-different-from-other-stablecoins)
-- [How Does the Monetary Policy in Ether Dollar Minimize the Risk?](#how-does-the-monetary-policy-in-ether-dollar-minimize-the-risk)
+- [What Are the Advantages of Ether Dollar over Other Stablecoins?](#what-are-the-advantages-of-ether-dollar-over-other-stablecoins)
+- [How Does Ether Bank Minimize the Default Risk for Loans?](#how-does-ether-bank-minimize-the-default-risk-for-loans)
 - [Disclaimer](#disclaimer)
 
 ### What is Ether Bank?
@@ -43,7 +43,7 @@
 * There is no obligation or time limit to settle the loans in Ether Bank. Clients can settle their loans whenever they intend to unless liquidation is applicable for them.
 * Ether Bank never prohibits loans with collaterals equal to or slightly higher than 1.5 times their amount. However, every time these loans have a lower amount of collateral compared to others, and the price of Ether dollars is less than its peg, they are instantly liquidated with some loss for the loan receivers and some benefit for the settlers.
 
-### How is Ether Dollar different from other stablecoins?
+### What Are the Advantages of Ether Dollar over Other Stablecoins?
 * Unlike fiat backed stablecoins, Ether dollar is decentralized and is not faced to counterparty risks. Moreover, it does not lose its value with the depreciation of fiat currency values.
 * Unlike non-collateralized stablecoins, Ether dollar can maintain its stability even if the demand for it reaches zero. This is done through settling all loans and decreasing the supply to zero. Non-collateralized stablecoins on the other hand, will face critical problems not only if their demand reaches zero, but also in case of long term decreases in demand for their tokens. Therefore, the risk of losing the peg is much higher in non-collateralized stablecoins compared to collateralized ones.
 * Other crypto-collateralized stablecoins define an additional token besides their stable one in order to use it as their governance token or as the collateral that backs their loans. In contrast, There is no such token in Ether dollar.
@@ -52,7 +52,8 @@
 * The elimination of additional tokens not only makes Ether dollar a zero cost solution for its clients but also extremely lowers the complexity of the system and minimizes the risks.
 
 
-### How Does the Monetary Policy in Ether Dollar Minimize the Risk?
+### How Does Ether Bank Minimize the Default Risk for Loans?
+* Assets and money are both stores of value. Those who intend to maximize their profit, tend to store value in assets, while, others who intend to minimize risks, store value in money. So an ideal money is the one with minimum risk of losing its value. The advantage of Ether dollar over its competitors is its emphasis on minimizing the risk.
 * The most significant risk for collateral based stablecoins is their collateral losing value to the extent that it is worth less than the loan. Ether Bank’s monetary policy maximizes the collaterals deposited by loan receivers to minimize this risk.
 * The loans in Ether Bank are completely free and clients pay no interest. There is also no time limit for paying back the loan and clients can settle their loans whenever they want to. The only requirement for receiving a loan is providing enough Ethers as collateral. This approach creates a huge demand in those who own Ethers and can provide them as collateral to receive free loans.
 * But the loans are limited in Ether Bank, because, every time the demand for receiving free loans from Ether Bank exceeds the demand for holding Ether dollars, the price of Ether dollars falls and the peg breaks.
