@@ -3,7 +3,7 @@
 ### Table of Contents
 
 - [What is Ether Bank?](#what-is-ether-bank)
-- [How Does Ether Bank Ensures Stability of Ether Dollar?](#how-does-ether-bank-ensures-stability-of-ether-dollar)
+- [How Does Ether Bank Ensure Stability of Ether Dollar?](#how-does-ether-bank-ensures-stability-of-ether-dollar)
 - [How is Ether Dollar Created or Eliminated?](#how-is-ether-dollar-created-or-eliminated)
 - [What Are the Advantages of Ether Dollar over Other Stablecoins?](#what-are-the-advantages-of-ether-dollar-over-other-stablecoins)
 - [How Does Ether Bank Minimize the Default Risk for Loans?](#how-does-ether-bank-minimize-the-default-risk-for-loans)
@@ -15,7 +15,7 @@
 * The loans are in form of Ether dollars that are stablecoins created by Ether Bank and backed by Ether.
 * Ether dollar does not depreciate in accordance with the inflations in the United States. 1 Ether dollar is worth as much as the purchasing power of a US dollar in 2014 which was the year Ethereum network initiated. Since US dollar depreciated by 6% during 2014 and 2018, an Ether dollar is worth 1.06 US dollars in 2018.
 
-### How Does Ether Bank Ensures Stability of Ether Dollar?
+### How Does Ether Bank Ensure Stability of Ether Dollar?
 * Ether Bank has a simple strategy for maintaining value. It creates Ether dollars to an extent that the supply is equal to the demand in the market. In other words, new Ether dollars are created when demand is increased and existing Ether dollars are eliminated when demand is decreased.
 * Unlike other Cryptoassets, newly created tokens are not awarded. They are rather issued as loans. The tokens are created by paying loans and eliminated by settling them.
 * Issuing new tokens by paying loans instead of awarding them enables Ether Bank to maintain the value of Ether dollar by eliminating some of the existing tokens when the demand for them decreases in the market. Elimination is done through settling some of the loans.
