@@ -39,6 +39,15 @@ contract Liquidator is Pausable {
     event LogStopLiquidation(uint64 liquidationId, uint256 bestBid, address bestBidder);
     event LogWithdraw(address withdrawalAccount, uint256 amount);
 
+    string private constant INVALID_ADDRESS = "INVALID_ADDRESS";
+    string private constant ONLY_ETHER_BANK = "ONLY_ETHER_BANK";
+    string private constant INVALID_AMOUNT = "INVALID_AMOUNT";
+    string private constant NOT_ACTIVE_LOAN = "NOT_ACTIVE_LOAN";
+    string private constant OPEN_LIQUIDATION = "OPEN_LIQUIDATION";
+    string private constant NO_BID = "NO_BID";
+    string private constant INADEQUATE_BIDDING = "INADEQUATE_BIDDING";
+    string private constant INSUFFICIENT_FUNDS = "INSUFFICIENT_FUNDS";
+
     constructor()
         public {
             owner = msg.sender;
@@ -55,7 +64,7 @@ contract Liquidator is Pausable {
         onlyOwner
         whenNotPaused
     {
-        require(_EtherBankAdd != address(0));
+        require(_EtherBankAdd != address(0), INVALID_ADDRESS);
         EtherBankAdd = _EtherBankAdd;
         bank = EtherBank(EtherBankAdd);
     }
@@ -69,7 +78,7 @@ contract Liquidator is Pausable {
         onlyOwner
         whenNotPaused
     {
-        require(_tokenAdd != address(0));
+        require(_tokenAdd != address(0), INVALID_ADDRESS);
         token = EtherDollar(_tokenAdd);
     }
 
@@ -94,7 +103,7 @@ contract Liquidator is Pausable {
         whenNotPaused
         throwIfEqualToZero(amount)
     {
-        require(amount <= deposits[msg.sender]);
+        require(amount <= deposits[msg.sender], INVALID_AMOUNT);
         deposits[msg.sender] -= amount;
         token.transfer(msg.sender, amount);
         emit LogWithdraw(msg.sender, amount);
@@ -141,8 +150,8 @@ contract Liquidator is Pausable {
         checkLiquidationState(liquidationId, LiquidationState.ACTIVE)
         whenNotPaused
     {
-        require(liquidations[liquidationId].endBlock <= block.number);
-        require(liquidations[liquidationId].bestBid != 0);
+        require(liquidations[liquidationId].endBlock <= block.number, OPEN_LIQUIDATION);
+        require(liquidations[liquidationId].bestBid != 0, NO_BID);
         liquidations[liquidationId].state = LiquidationState.FINISHED;
         token.burn(liquidations[liquidationId].loanAmount);
         bank.liquidated(
@@ -162,10 +171,10 @@ contract Liquidator is Pausable {
         whenNotPaused
         checkLiquidationState(liquidationId, LiquidationState.ACTIVE)
     {
-        require(liquidations[liquidationId].loanAmount <= token.allowance(msg.sender, this));
+        require(liquidations[liquidationId].loanAmount <= token.allowance(msg.sender, this), INSUFFICIENT_FUNDS);
+        require(bidAmount < liquidations[liquidationId].bestBid, INADEQUATE_BIDDING);
         token.transferFrom(msg.sender, this, liquidations[liquidationId].loanAmount);
         deposits[msg.sender] += liquidations[liquidationId].loanAmount;
-        require(bidAmount < liquidations[liquidationId].bestBid);
         deposits[liquidations[liquidationId].bestBidder] += liquidations[liquidationId].loanAmount;
         deposits[msg.sender] -= liquidations[liquidationId].loanAmount;
         liquidations[liquidationId].bestBidder = msg.sender;
@@ -192,7 +201,7 @@ contract Liquidator is Pausable {
      * @param needState The state which needed.
      */
     modifier checkLiquidationState(uint64 liquidationId, LiquidationState needState) {
-        require(liquidations[liquidationId].state == needState);
+        require(liquidations[liquidationId].state == needState, NOT_ACTIVE_LOAN);
         _;
     }
 
@@ -201,7 +210,7 @@ contract Liquidator is Pausable {
      * @param number The number to validate.
      */
     modifier throwIfEqualToZero(uint number) {
-        require(number != 0);
+        require(number != 0, INVALID_AMOUNT);
         _;
     }
 
@@ -209,7 +218,7 @@ contract Liquidator is Pausable {
      * @dev Throws if called by any account other than our EtherBank smart conrtact.
      */
     modifier onlyEtherBankSC() {
-        require(msg.sender == EtherBankAdd);
+        require(msg.sender == EtherBankAdd, ONLY_ETHER_BANK);
         _;
     }
 }

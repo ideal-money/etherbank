@@ -40,6 +40,10 @@ contract Oracles is Pausable {
     event LogVote(address oracle, uint8 _type, uint256 _value);
     event LogUpdate(uint8 _type, uint256 _value);
 
+    string private constant INVALID_ADDRESS = "INVALID_ADDRESS";
+    string private constant RECRUITING_FINISHED = "RECRUITING_FINISHED";
+
+
     constructor()
         public {
             owner = msg.sender;
@@ -55,7 +59,7 @@ contract Oracles is Pausable {
         onlyOwner
         whenNotPaused
     {
-        require(_EtherBankAdd != address(0));
+        require(_EtherBankAdd != address(0), INVALID_ADDRESS);
 
         bank = EtherBank(_EtherBankAdd);
     }
@@ -115,7 +119,7 @@ contract Oracles is Pausable {
         canRecruiting
         whenNotPaused
     {
-        require(_account != address(0));
+        require(_account != address(0), INVALID_ADDRESS);
         if (_score != 0 && oracles[_account].isActive == false) {
             oracles[_account].isActive = true;
             oracles[_account].score = _score;
@@ -149,7 +153,7 @@ contract Oracles is Pausable {
      * @dev Throws if recruiting finished.
      */
     modifier canRecruiting() {
-        require(!recruitingFinished);
+        require(!recruitingFinished, RECRUITING_FINISHED);
         _;
     }
 

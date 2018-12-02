@@ -50,7 +50,7 @@ contract EtherBank is Pausable {
     event LoanGot(address borrower, uint256 collateralAmount, uint256 amount, uint64 loanId);
     event LoanSettled(address borrower, uint256 collateralAmount, uint256 amount, uint64 loanId);
 
-    string private constant INVALID_ADDRESS = "INVALID_ADDRESS/A";
+    string private constant INVALID_ADDRESS = "INVALID_ADDRESS";
     string private constant ONLY_ORACLE = "ONLY_ORACLE";
     string private constant INVALID_AMOUNT = "INVALID_AMOUNT";
     string private constant COLLATERAL_NOT_ENOUGH = "COLLATERAL_NOT_ENOUGH";
@@ -154,8 +154,8 @@ contract EtherBank is Pausable {
         loans[loanId].collateralAmount = msg.value.sub(loanFee);
         loans[loanId].amount = amount;
         loans[loanId].state = LoanState.ACTIVE;
-        token.mint(msg.sender, amount);
         emit LoanGot(msg.sender, msg.value, amount, loanId);
+        token.mint(msg.sender, amount);
     }
 
     /**
@@ -173,7 +173,6 @@ contract EtherBank is Pausable {
         require(amount <= loans[loanId].amount, INVALID_AMOUNT);
         require(loans[loanId].state == LoanState.ACTIVE, NOT_ACTIVE_LOAN);
 
-        token.transferFrom(msg.sender, this, amount);
         uint256 paybackCollateralAmount = (loans[loanId].collateralAmount.mul(amount)).div(loans[loanId].amount);
         token.burn(amount);
         loans[loanId].collateralAmount -= paybackCollateralAmount;
@@ -182,7 +181,9 @@ contract EtherBank is Pausable {
             loans[loanId].state = LoanState.SETTLED;
         }
         emit LoanSettled(msg.sender, paybackCollateralAmount, amount, loanId);
-        msg.sender.transfer(paybackCollateralAmount);
+        if (token.transferFrom(msg.sender, this, amount)) {
+        	msg.sender.transfer(paybackCollateralAmount);
+        }
     }
 
     /**
