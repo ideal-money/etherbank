@@ -13,12 +13,13 @@ contract EtherBank is Pausable {
     Liquidator public liquidator;
 
     uint256 constant public PRECISION_POINT = 10 ** 3;
+
     uint256 constant public ETHER_TO_WEI = 10 ** 18;
 
     address public oracleAddress;
     address public liquidatorAdd;
-    uint256 public loanFeeRatio;
-    uint64 public lastLoanId;
+    uint256 public loanFeeRatio; // ONE_THOUSANDTH
+    uint256 public lastLoanId;
     uint256 public depositRate;
     uint256 public etherPrice; // cent of EtherDollar
     address public owner;
@@ -45,13 +46,13 @@ contract EtherBank is Pausable {
         LoanState state;
     }
 
-    mapping(uint64 => Loan) private loans;
+    mapping(uint256 => Loan) private loans;
 
-    event LoanGot(address borrower, uint256 collateralAmount, uint256 amount, uint64 loanId);
-    event LoanSettled(address borrower, uint256 collateralAmount, uint256 amount, uint64 loanId);
+    event LoanGot(address indexed borrower, uint256 indexed loanId, uint256 collateralAmount, uint256 amount);
+    event LoanSettled(address borrower, uint256 indexed loanId, uint256 collateralAmount, uint256 amount);
 
     string private constant INVALID_ADDRESS = "INVALID_ADDRESS";
-    string private constant ONLY_ORACLE = "ONLY_ORACLE";
+    string private constant ONLY_ORACLES = "ONLY_ORACLE";
     string private constant INVALID_AMOUNT = "INVALID_AMOUNT";
     string private constant COLLATERAL_NOT_ENOUGH = "COLLATERAL_NOT_ENOUGH";
     string private constant ONLY_LOAN_OWNER = "ONLY_LOAN_OWNER";
@@ -60,9 +61,12 @@ contract EtherBank is Pausable {
     string private constant ENOUGH_COLLATERAL = "ENOUGH_COLLATERAL";
     string private constant ONLY_LIQUIDATOR = "ONLY_LIQUIDATOR";
 
-    constructor()
+    constructor(address _tokenAdd)
         public {
+            token = EtherDollar(_tokenAdd);
             owner = msg.sender;
+            etherPrice = 100;
+            depositRate = 1500;
             oracleAddress = 0x0;
             loanFeeRatio = 5;
             lastLoanId = 0;
@@ -124,7 +128,7 @@ contract EtherBank is Pausable {
      */
     function setVariable(uint256 _type, uint256 value)
         public
-        onlyOracle
+        onlyOracles
     {
         if (uint(Types.ETHER_PRICE) == _type) {
             etherPrice = value;
@@ -146,15 +150,18 @@ contract EtherBank is Pausable {
         payable
         whenNotPaused
         throwIfEqualToZero(amount)
-        enoughCollateral(amount)
+        // enoughCollateral(amount)
     {
-        uint loanFee = msg.value.mul(loanFeeRatio).div(PRECISION_POINT);
-        uint64 loanId = ++lastLoanId;
+        // TODO: msg.value or amount?
+        // uint loanFee = msg.value.mul(loanFeeRatio).div(PRECISION_POINT);
+        uint256 weis_per_cent = ETHER_TO_WEI.div(etherPrice);
+        uint256 loanFee = amount.mul(loanFeeRatio).div(PRECISION_POINT).mul(weis_per_cent);
+        uint256 loanId = ++lastLoanId;
         loans[loanId].debtor = msg.sender;
         loans[loanId].collateralAmount = msg.value.sub(loanFee);
         loans[loanId].amount = amount;
         loans[loanId].state = LoanState.ACTIVE;
-        emit LoanGot(msg.sender, msg.value, amount, loanId);
+        emit LoanGot(msg.sender, loanId, msg.value, amount);
         token.mint(msg.sender, amount);
     }
 
@@ -163,7 +170,7 @@ contract EtherBank is Pausable {
      * @param amount The etherDollar amount payed back.
      * @param loanId The loan id.
      */
-    function settleLoan(uint256 amount, uint64 loanId)
+    function settleLoan(uint256 amount, uint256 loanId)
         public
         whenNotPaused
         onlyLoanOwner(loanId)
@@ -172,16 +179,16 @@ contract EtherBank is Pausable {
         require(amount <= token.allowance(msg.sender, this), NOT_ENOUGH_ALLOWANCE);
         require(amount <= loans[loanId].amount, INVALID_AMOUNT);
         require(loans[loanId].state == LoanState.ACTIVE, NOT_ACTIVE_LOAN);
-
-        uint256 paybackCollateralAmount = (loans[loanId].collateralAmount.mul(amount)).div(loans[loanId].amount);
+        uint256 paybackCollateralAmount = loans[loanId].collateralAmount.mul(amount).div(loans[loanId].amount);
+        token.transferFrom(msg.sender, this, amount);
         token.burn(amount);
         loans[loanId].collateralAmount -= paybackCollateralAmount;
         loans[loanId].amount -= amount;
         if (loans[loanId].amount == 0) {
             loans[loanId].state = LoanState.SETTLED;
         }
-        emit LoanSettled(msg.sender, paybackCollateralAmount, amount, loanId);
         if (token.transferFrom(msg.sender, this, amount)) {
+            emit LoanSettled(msg.sender, loanId, paybackCollateralAmount, amount);
         	msg.sender.transfer(paybackCollateralAmount);
         }
     }
@@ -190,7 +197,7 @@ contract EtherBank is Pausable {
      * @dev liquidate collateral of the loan.
      * @param loanId The loan id.
      */
-    function liquidate(uint64 loanId)
+    function liquidate(uint256 loanId)
         public
         whenNotPaused
     {
@@ -210,7 +217,7 @@ contract EtherBank is Pausable {
      * @param amount The bid of winner.
      * @param buyer The winner account.
      */
-    function liquidated(uint64 loanId, uint256 amount, address buyer)
+    function liquidated(uint256 loanId, uint256 amount, address buyer)
         public
         whenNotPaused
         onlyLiquidator
@@ -224,8 +231,8 @@ contract EtherBank is Pausable {
     /**
      * @dev Throws if called by any account other than our Oracle.
      */
-    modifier onlyOracle() {
-        require(msg.sender == oracleAddress, ONLY_ORACLE);
+    modifier onlyOracles() {
+        require(msg.sender == oracleAddress, ONLY_ORACLES);
         _;
     }
 
@@ -259,7 +266,7 @@ contract EtherBank is Pausable {
      * @dev Throws if called by any account other than the owner of the loan.
      * @param loanId The loan id.
      */
-    modifier onlyLoanOwner(uint64 loanId) {
+    modifier onlyLoanOwner(uint256 loanId) {
         require(loans[loanId].debtor == msg.sender, ONLY_LOAN_OWNER);
         _;
     }

@@ -12,8 +12,8 @@ contract Liquidator is Pausable {
     EtherBank public bank;
 
     address public owner;
-    address public EtherBankAdd;
-    uint64 public lastLiquidationId;
+    address public etherBankAddr;
+    uint256 public lastLiquidationId;
 
     enum LiquidationState {
         ACTIVE,
@@ -22,7 +22,7 @@ contract Liquidator is Pausable {
     }
 
     struct Liquidation {
-        uint64 loanId;
+        uint256 loanId;
         uint256 collateralAmount;
         uint256 loanAmount;
         uint256 startBlock;
@@ -35,8 +35,8 @@ contract Liquidator is Pausable {
     mapping(uint256 => Liquidation) private liquidations;
     mapping(address => uint256) private deposits;
 
-    event LogStartLiquidation(uint64 liquidationId, uint256 collateralAmount, uint256 loanAmount, uint256 startBlock, uint256 endBlock);
-    event LogStopLiquidation(uint64 liquidationId, uint256 bestBid, address bestBidder);
+    event LogStartLiquidation(uint256 liquidationId, uint256 collateralAmount, uint256 loanAmount, uint256 startBlock, uint256 endBlock);
+    event LogStopLiquidation(uint256 liquidationId, uint256 bestBid, address bestBidder);
     event LogWithdraw(address withdrawalAccount, uint256 amount);
 
     string private constant INVALID_ADDRESS = "INVALID_ADDRESS";
@@ -48,38 +48,41 @@ contract Liquidator is Pausable {
     string private constant INADEQUATE_BIDDING = "INADEQUATE_BIDDING";
     string private constant INSUFFICIENT_FUNDS = "INSUFFICIENT_FUNDS";
 
-    constructor()
+    constructor(address _tokenAddr, address _etherBankAddr)
         public {
             owner = msg.sender;
-            EtherBankAdd = 0x0;
+            // etherBankAddr = 0x0;
             lastLiquidationId = 0;
+            etherBankAddr = _etherBankAddr;
+            bank = EtherBank(etherBankAddr);
+            token = EtherDollar(_tokenAddr);
         }
 
     /**
      * @dev Set EtherBank smart contract address.
-     * @param _EtherBankAdd The EtherBank smart contract address.
+     * @param _etherBankAddr The EtherBank smart contract address.
      */
-    function setEtherBank(address _EtherBankAdd)
+    function setEtherBank(address _etherBankAddr)
         external
         onlyOwner
         whenNotPaused
     {
-        require(_EtherBankAdd != address(0), INVALID_ADDRESS);
-        EtherBankAdd = _EtherBankAdd;
-        bank = EtherBank(EtherBankAdd);
+        require(_etherBankAddr != address(0), INVALID_ADDRESS);
+        etherBankAddr = _etherBankAddr;
+        bank = EtherBank(etherBankAddr);
     }
 
     /**
      * @dev Set EtherDollar smart contract address.
-     * @param _tokenAdd The EtherDollar smart contract address.
+     * @param _tokenAddr The EtherDollar smart contract address.
      */
-    function setEtherDollar(address _tokenAdd)
+    function setEtherDollar(address _tokenAddr)
         external
         onlyOwner
         whenNotPaused
     {
-        require(_tokenAdd != address(0), INVALID_ADDRESS);
-        token = EtherDollar(_tokenAdd);
+        require(_tokenAddr != address(0), INVALID_ADDRESS);
+        token = EtherDollar(_tokenAddr);
     }
 
     /**
@@ -118,7 +121,7 @@ contract Liquidator is Pausable {
      */
     function startLiquidation(
         uint256 _numberOfBlocks,
-        uint64 _loanId,
+        uint256 _loanId,
         uint256 _collateralAmount,
         uint256 _loanAmount
     )
@@ -131,7 +134,7 @@ contract Liquidator is Pausable {
     {
         uint256 startBlock = block.number;
         uint256 endBlock = startBlock.add(_numberOfBlocks);
-        uint64 liquidationId = ++lastLiquidationId;
+        uint256 liquidationId = ++lastLiquidationId;
         liquidations[liquidationId].loanId = _loanId;
         liquidations[liquidationId].collateralAmount = _collateralAmount;
         liquidations[liquidationId].loanAmount = _loanAmount;
@@ -145,7 +148,7 @@ contract Liquidator is Pausable {
      * @dev stop an liquidation.
      * @param liquidationId The id of the liquidation.
      */
-    function stopLiquidation(uint64 liquidationId)
+    function stopLiquidation(uint256 liquidationId)
         public
         checkLiquidationState(liquidationId, LiquidationState.ACTIVE)
         whenNotPaused
@@ -166,7 +169,7 @@ contract Liquidator is Pausable {
      * @dev palce a bid on the liquidation.
      * @param liquidationId The id of the liquidation.
      */
-    function placeBid(uint64 liquidationId, uint256 bidAmount)
+    function placeBid(uint256 liquidationId, uint256 bidAmount)
         public
         whenNotPaused
         checkLiquidationState(liquidationId, LiquidationState.ACTIVE)
@@ -185,7 +188,7 @@ contract Liquidator is Pausable {
      * @dev Get the best bid of the liquidation.
      * @param liquidationId The id of the liquidation.
      */
-    function getBestBid(uint64 liquidationId)
+    function getBestBid(uint256 liquidationId)
         public
         view
         whenNotPaused
@@ -200,7 +203,7 @@ contract Liquidator is Pausable {
      * @param liquidationId The id of the liquidation.
      * @param needState The state which needed.
      */
-    modifier checkLiquidationState(uint64 liquidationId, LiquidationState needState) {
+    modifier checkLiquidationState(uint256 liquidationId, LiquidationState needState) {
         require(liquidations[liquidationId].state == needState, NOT_ACTIVE_LOAN);
         _;
     }
@@ -218,7 +221,7 @@ contract Liquidator is Pausable {
      * @dev Throws if called by any account other than our EtherBank smart conrtact.
      */
     modifier onlyEtherBankSC() {
-        require(msg.sender == EtherBankAdd, ONLY_ETHER_BANK);
+        require(msg.sender == etherBankAddr, ONLY_ETHER_BANK);
         _;
     }
 }

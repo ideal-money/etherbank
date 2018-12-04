@@ -44,24 +44,25 @@ contract Oracles is Pausable {
     string private constant RECRUITING_FINISHED = "RECRUITING_FINISHED";
 
 
-    constructor()
+    constructor(address _etherBankAddr)
         public {
             owner = msg.sender;
             totalScore = 0;
+            bank = EtherBank(_etherBankAddr);
         }
 
     /**
      * @dev Set EtherBank smart contract.
-     * @param _EtherBankAdd The EtherBank smart contract address.
+     * @param _etherBankAddr The EtherBank smart contract address.
      */
-    function setEtherBank(address _EtherBankAdd)
+    function setEtherBank(address _etherBankAddr)
         external
         onlyOwner
         whenNotPaused
     {
-        require(_EtherBankAdd != address(0), INVALID_ADDRESS);
+        require(_etherBankAddr != address(0), INVALID_ADDRESS);
 
-        bank = EtherBank(_EtherBankAdd);
+        bank = EtherBank(_etherBankAddr);
     }
 
     /**
