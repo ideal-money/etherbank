@@ -65,10 +65,10 @@ contract EtherBank is Pausable {
         public {
             token = EtherDollar(_tokenAdd);
             owner = msg.sender;
-            etherPrice = 100;
-            depositRate = 1500;
+            etherPrice = 10000; // CENT
+            depositRate = 1500; // = 1.5
             oracleAddress = 0x0;
-            loanFeeRatio = 5;
+            loanFeeRatio = 5; // = .005
             lastLoanId = 0;
             liquidationDuration = 480; // 480 blocks or 2 hours.
         }
@@ -150,10 +150,8 @@ contract EtherBank is Pausable {
         payable
         whenNotPaused
         throwIfEqualToZero(amount)
-        // enoughCollateral(amount)
+        enoughCollateral(amount)
     {
-        // TODO: msg.value or amount?
-        // uint loanFee = msg.value.mul(loanFeeRatio).div(PRECISION_POINT);
         uint256 weis_per_cent = ETHER_TO_WEI.div(etherPrice);
         uint256 loanFee = amount.mul(loanFeeRatio).div(PRECISION_POINT).mul(weis_per_cent);
         uint256 loanId = ++lastLoanId;
@@ -180,16 +178,15 @@ contract EtherBank is Pausable {
         require(amount <= loans[loanId].amount, INVALID_AMOUNT);
         require(loans[loanId].state == LoanState.ACTIVE, NOT_ACTIVE_LOAN);
         uint256 paybackCollateralAmount = loans[loanId].collateralAmount.mul(amount).div(loans[loanId].amount);
-        token.transferFrom(msg.sender, this, amount);
-        token.burn(amount);
-        loans[loanId].collateralAmount -= paybackCollateralAmount;
-        loans[loanId].amount -= amount;
-        if (loans[loanId].amount == 0) {
-            loans[loanId].state = LoanState.SETTLED;
-        }
         if (token.transferFrom(msg.sender, this, amount)) {
+            token.burn(amount);
+            loans[loanId].collateralAmount -= paybackCollateralAmount;
+            loans[loanId].amount -= amount;
+            if (loans[loanId].amount == 0) {
+                loans[loanId].state = LoanState.SETTLED;
+            }
             emit LoanSettled(msg.sender, loanId, paybackCollateralAmount, amount);
-        	msg.sender.transfer(paybackCollateralAmount);
+            msg.sender.transfer(paybackCollateralAmount);
         }
     }
 
