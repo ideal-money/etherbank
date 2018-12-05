@@ -13,7 +13,6 @@ contract EtherBank is Pausable {
     Liquidator public liquidator;
 
     uint256 constant public PRECISION_POINT = 10 ** 3;
-
     uint256 constant public ETHER_TO_WEI = 10 ** 18;
 
     address public oracleAddress;

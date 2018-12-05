@@ -35,10 +35,10 @@ contract Oracles is Pausable {
     mapping(uint8 => Voting) private votings;
     mapping(address => Oracle) private oracles;
 
-    event LogEditOracles(address oracle, uint256 score);
-    event LogFinishRecruiting();
-    event LogVote(address oracle, uint8 _type, uint256 _value);
-    event LogUpdate(uint8 _type, uint256 _value);
+    event EditOracles(address oracle, uint256 score);
+    event FinishRecruiting();
+    event SetVote(address oracle, uint8 _type, uint256 _value);
+    event Update(uint8 _type, uint256 _value);
 
     string private constant INVALID_ADDRESS = "INVALID_ADDRESS";
     string private constant RECRUITING_FINISHED = "RECRUITING_FINISHED";
@@ -81,7 +81,7 @@ contract Oracles is Pausable {
             votings[_type].No++;
         }
         if (votes[votesKey].votingNo == votings[_type].No) {
-            votings[_type].sum -= votes[votesKey].value.mul(score);
+            votings[_type].sum -= votes[votesKey].value * score;
             votings[_type].sumScores -= score;
         }
         votes[votesKey].value = _value;
@@ -91,7 +91,7 @@ contract Oracles is Pausable {
         if ((totalScore / votings[_type].sumScores) < 2) {
             updateEtherBank(_type);
         }
-        emit LogVote(oracle, _type, _value);
+        emit SetVote(oracle, _type, _value);
     }
 
     /**
@@ -99,14 +99,14 @@ contract Oracles is Pausable {
      * @param _type The variable code.
      */
     function updateEtherBank(uint8 _type)
-    internal
+        internal
     {
         uint256 _value = votings[_type].sum / votings[_type].sumScores;
         bank.setVariable(_type, _value);
         votings[_type].sum = 0;
         votings[_type].sumScores = 0;
         votings[_type].No++;
-        emit LogUpdate(_type, _value);
+        emit Update(_type, _value);
     }
 
     /**
@@ -121,21 +121,21 @@ contract Oracles is Pausable {
         whenNotPaused
     {
         require(_account != address(0), INVALID_ADDRESS);
-        if (_score != 0 && oracles[_account].isActive == false) {
+        if (_score != 0 && !oracles[_account].isActive) {
             oracles[_account].isActive = true;
             oracles[_account].score = _score;
             oracles[_account].account = _account;
             totalScore += _score;
-        } else if (_score != 0 && oracles[_account].isActive == true) {
+        } else if (_score != 0 && oracles[_account].isActive) {
             totalScore -= oracles[_account].score;
             totalScore += _score;
             oracles[_account].score = _score;
-        } else if (_score == 0 && oracles[_account].isActive == true) {
+        } else if (_score == 0 && oracles[_account].isActive) {
             oracles[_account].isActive = false;
+            totalScore -= oracles[_account].score;
             oracles[_account].score = _score;
-            totalScore -= _score;
         }
-        emit LogEditOracles(_account, _score);
+        emit EditOracles(_account, _score);
     }
 
     /**
@@ -147,7 +147,7 @@ contract Oracles is Pausable {
     canRecruiting
     returns (bool) {
         recruitingFinished = true;
-        emit LogFinishRecruiting();
+        emit FinishRecruiting();
     }
 
     /**
@@ -157,5 +157,4 @@ contract Oracles is Pausable {
         require(!recruitingFinished, RECRUITING_FINISHED);
         _;
     }
-
 }
