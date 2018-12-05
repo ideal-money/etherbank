@@ -48,7 +48,7 @@
 * Unlike non-collateralized stablecoins, Ether dollar can maintain its stability even if the demand for it reaches zero. This is done through settling all loans and decreasing the supply to zero. Non-collateralized stablecoins on the other hand, will face critical problems not only if their demand reaches zero, but also in case of long term decreases in demand for their tokens. Therefore, the risk of losing the peg is much higher in non-collateralized stablecoins compared to collateralized ones.
 * Other crypto-collateralized stablecoins define an additional token besides their stable one in order to use it as their governance token or as the collateral that backs their loans. In contrast, There is no such token in Ether dollar.
     * Tokens that are used as collateral in a stablecoin system enjoys a high demand. Those who define their own token as collateral tend to be after the benefits of this high demand for themself. But, relying on a weak token with a low market cap will eventually heighten the risk of their stable token. The loans in Ether dollar are backed by Ether. This way both Ether and Ether dollar mutually benefit from each other. Ether dollar enjoys the benefits of relying on a robust token with a huge market cap. And Ether enjoys a higher demand due to its use as collateral.
-    * Ether dollar believes that a cryptocurrency should be robust by the rule of law and not in the hands of investors and their decisions through consensus or what not. Stablecoins with governance tokens provide opportunities for their investors to modify the system to their own benefit and not to the benefits of stablecoin lenders and holders. For instance, one can easily observe the reasons behind the sudden 5x rise in the stability fees of Maker to the benefits of MKR holders. When in fact, this rise could have been in the saving rate and to the benefit of DAI holders.
+    * Ether dollar believes that a cryptocurrency should be robust by the rule of law and not in the hands of investors and their decisions through consensus. Stablecoins with governance tokens provide opportunities for their investors to modify the system to their own benefit and not to the benefits of stablecoin lenders and holders. For instance, one can easily observe the reasons behind the sudden 5x rise in the stability fees of Maker to the benefits of MKR holders. When in fact, this rise could have been in the saving rate and to the benefit of DAI holders.
 * The elimination of additional tokens not only makes Ether dollar a zero cost solution for its clients but also extremely lowers the complexity of the system and minimizes the risks.
 
 
@@ -63,8 +63,8 @@
 
 
 ### Disclaimer
-This repository is created as the proof of concept for Ether Dollar to demonstrate how it can be created as the simplest and most reliable kind of money  on the Ethereum network.
+This repository is created as the proof of concept for Ether Dollar to demonstrate how it can be created as the simplest and most reliable kind of money on the Ethereum network.
 
-The source codes in this repository is highly experimental and under heavy development. Do not use it for anything security-critical yet. 
+The source code in this repository is highly experimental and under heavy development. Do not use it for anything security-critical yet. 
 
 All usage is at your own risk!
