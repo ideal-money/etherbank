@@ -66,7 +66,6 @@ contract EtherBank is Pausable {
             owner = msg.sender;
             etherPrice = 10000; // CENT
             depositRate = 1500; // = 1.5
-            oracleAddress = 0x0;
             loanFeeRatio = 5; // = .005
             lastLoanId = 0;
             liquidationDuration = 480; // 480 blocks or 2 hours.

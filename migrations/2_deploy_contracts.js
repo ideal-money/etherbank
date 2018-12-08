@@ -21,6 +21,7 @@ module.exports = function (deployer) {
     const instanceLiquidator = await Liquidator.deployed();
 
     await instanceEtherBank.setLiquidator(instanceLiquidator.address)
+    await instanceEtherBank.setOracle(instanceOracles.address)
 
   })
 }

@@ -38,7 +38,7 @@ contract Oracles is Pausable {
     event EditOracles(address oracle, uint256 score);
     event FinishRecruiting();
     event SetVote(address oracle, uint8 _type, uint256 _value);
-    event Update(uint8 _type, uint256 _value);
+    event Update(uint8 indexed _type, uint256 _value);
 
     string private constant INVALID_ADDRESS = "INVALID_ADDRESS";
     string private constant RECRUITING_FINISHED = "RECRUITING_FINISHED";
@@ -88,10 +88,10 @@ contract Oracles is Pausable {
         votes[votesKey].votingNo = votings[_type].No;
         votings[_type].sum += (_value.mul(score));
         votings[_type].sumScores += score;
+        emit SetVote(oracle, _type, _value);
         if ((totalScore / votings[_type].sumScores) < 2) {
             updateEtherBank(_type);
         }
-        emit SetVote(oracle, _type, _value);
     }
 
     /**

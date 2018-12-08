@@ -35,9 +35,9 @@ contract Liquidator is Pausable {
     mapping(uint256 => Liquidation) private liquidations;
     mapping(address => uint256) private deposits;
 
-    event LogStartLiquidation(uint256 liquidationId, uint256 collateralAmount, uint256 loanAmount, uint256 startBlock, uint256 endBlock);
-    event LogStopLiquidation(uint256 liquidationId, uint256 bestBid, address bestBidder);
-    event LogWithdraw(address withdrawalAccount, uint256 amount);
+    event StartLiquidation(uint256 indexed liquidationId, uint256 indexed loanId, uint256 collateralAmount, uint256 loanAmount, uint256 startBlock, uint256 endBlock);
+    event StopLiquidation(uint256 indexed liquidationId, uint256 indexed loanId, uint256 bestBid, address bestBidder);
+    event Withdraw(address indexed withdrawalAccount, uint256 amount);
 
     string private constant INVALID_ADDRESS = "INVALID_ADDRESS";
     string private constant ONLY_ETHER_BANK = "ONLY_ETHER_BANK";
@@ -51,7 +51,6 @@ contract Liquidator is Pausable {
     constructor(address _tokenAddr, address _etherBankAddr)
         public {
             owner = msg.sender;
-            // etherBankAddr = 0x0;
             lastLiquidationId = 0;
             etherBankAddr = _etherBankAddr;
             bank = EtherBank(etherBankAddr);
@@ -109,7 +108,7 @@ contract Liquidator is Pausable {
         require(amount <= deposits[msg.sender], INVALID_AMOUNT);
         deposits[msg.sender] -= amount;
         token.transfer(msg.sender, amount);
-        emit LogWithdraw(msg.sender, amount);
+        emit Withdraw(msg.sender, amount);
     }
 
     /**
@@ -141,7 +140,7 @@ contract Liquidator is Pausable {
         liquidations[liquidationId].startBlock = startBlock;
         liquidations[liquidationId].endBlock = endBlock;
         liquidations[liquidationId].state = LiquidationState.ACTIVE;
-        emit LogStartLiquidation(liquidationId, _collateralAmount, _loanAmount, startBlock, endBlock);
+        emit StartLiquidation(liquidationId, _loanId, _collateralAmount, _loanAmount, startBlock, endBlock);
     }
 
     /**
@@ -162,7 +161,7 @@ contract Liquidator is Pausable {
             liquidations[liquidationId].bestBid,
             liquidations[liquidationId].bestBidder
         );
-        emit LogStopLiquidation(liquidationId, liquidations[liquidationId].bestBid, liquidations[liquidationId].bestBidder);
+        emit StopLiquidation(liquidationId, liquidations[liquidationId].loanId, liquidations[liquidationId].bestBid, liquidations[liquidationId].bestBidder);
     }
 
     /**
@@ -175,11 +174,11 @@ contract Liquidator is Pausable {
         checkLiquidationState(liquidationId, LiquidationState.ACTIVE)
     {
         require(liquidations[liquidationId].loanAmount <= token.allowance(msg.sender, this), INSUFFICIENT_FUNDS);
-        require(bidAmount < liquidations[liquidationId].bestBid, INADEQUATE_BIDDING);
+        if (liquidations[liquidationId].bestBid != 0){
+            require(bidAmount < liquidations[liquidationId].bestBid, INADEQUATE_BIDDING);
+        }
         token.transferFrom(msg.sender, this, liquidations[liquidationId].loanAmount);
-        deposits[msg.sender] += liquidations[liquidationId].loanAmount;
         deposits[liquidations[liquidationId].bestBidder] += liquidations[liquidationId].loanAmount;
-        deposits[msg.sender] -= liquidations[liquidationId].loanAmount;
         liquidations[liquidationId].bestBidder = msg.sender;
         liquidations[liquidationId].bestBid = bidAmount;
     }
@@ -192,10 +191,9 @@ contract Liquidator is Pausable {
         public
         view
         whenNotPaused
-        checkLiquidationState(liquidationId, LiquidationState.ACTIVE)
-        returns(uint256)
+        returns(address,uint256)
     {
-        return liquidations[liquidationId].bestBid;
+        return (liquidations[liquidationId].bestBidder, liquidations[liquidationId].bestBid);
     }
 
     /**
