@@ -9,6 +9,7 @@ Ether dollar makes it possible for people to store value in decentralized money 
 **Ether Dollar Benefits ETH HODLers**
 
 Ether dollar makes it possible for ETH hodlers to receive zero interest loans with no due time in order to deal with their expenses without spending their ETH.
+
 Moreover, using ETH to back loans not only increases the demand for but also decreases the supply of ETH and eventually results into a significant boost in price.
 
 ### Ether Bank as a Lending Platform
