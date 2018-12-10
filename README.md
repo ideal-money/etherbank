@@ -27,6 +27,24 @@ The loans in Ether Bank are paid in Ether dollars which are crypto-collateralize
 | Reliability  | Have High default risk                                     | Has low default risk                 |
 |              | Require higher fee and interest in high demands to benefit the investors | Requires higher collateral in high demands to  secure the system |
 
+
+### Stability Mechanism; Simply Put.
+* Ether Bank has a simple strategy for maintaining value. It creates Ether dollars to an extent that the supply is equal to the demand in the market. In other words, new Ether dollars are created when demand is increased and existing Ether dollars are eliminated when demand is decreased.
+* Whenever Ether dollar price is higher than the index it is pegged to, it signals that the supply does not suffice the demand at the moment. Consequently, the system has to increase the supply by giving out new loans. Similiarly, when price falls below the index, it is a signal for lower demands, and the system should curb the loaning process.    
+* Unlike other Cryptoassets, newly created tokens are not awarded. They are rather issued as loans. The tokens are created by paying loans and eliminated by settling them.
+* Issuing new tokens by paying loans instead of awarding them enables Ether Bank to maintain the value of Ether dollar by eliminating some of the existing tokens when the demand for them decreases in the market. Elimination is done through settling some of the loans.
+
+
+| Cryptoassets | Ether dollar |
+| ------------ | ------------ |
+| Supply is a function of time | Supply is a function of demand |
+| They are created over time and can never be destroyed after being created | They are created when demand for holding them increases and destroyed when demand decreases |
+| Newly created tokens are awarded, so there is no way to destroy them after creation | Newly created tokens are paid as loans, so they can easily be destroyed by settlement |
+| When demand increases, their market is balanced by the rise of the price | When demand increases, their market is balanced by creation of new tokens |
+| When demand decreases, their market is balanced by the fall of the price | When demand decreases, their market is balanced by destruction of previously created tokens |
+| Supply is stable just like gold | Price is stable just like money |
+
+
 ### Disclaimer
 This repository is created as the proof of concept for Ether Dollar to demonstrate how it can be created as the simplest and most reliable kind of money  on the Ethereum network.
 
