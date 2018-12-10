@@ -49,6 +49,10 @@ The loans in Ether Bank are paid in Ether dollars which are crypto-collateralize
 | When demand decreases, their market is balanced by the fall of the price | When demand decreases, their market is balanced by destruction of previously created tokens |
 | Supply is stable just like gold | Price is stable just like money |
 
+### More Information
+* [Advantages of Ether Dollar over Other Stablecoins](https://github.com/ideal-money/EtherBank/wiki/Advantages-of-Ether-Dollar-over-Other-Stablecoins)
+* [Why is Ether dollar the least likley stablecoin to lose the peg?](https://github.com/ideal-money/EtherBank/wiki/Why-is-Ether-dollar-the-least-likley-stablecoin-to-lose-the-peg%3F)
+* [Technical Overview](https://github.com/ideal-money/EtherBank/wiki/Technical-Overview)
 
 ### Disclaimer
 This repository is created as the proof of concept for Ether Dollar to demonstrate how it can be created as the simplest and most reliable kind of money  on the Ethereum network.
