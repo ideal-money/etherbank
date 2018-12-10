@@ -1,37 +1,22 @@
-## Ether Bank, Making Zero Interest Loans for Ether HODLers
+Ether Bank is a decentralized bank on Ethereum. It gives out zero-interest loans for Ether holders. The loans allow Ether holders to deal with their expenses without selling their ETH.
 
-### Table of Contents
+### Ether Bank as a Lending Platform
+Current decentralized loan solutions like SALT, Nexo, or MakerDAO require 2.5% to 22% interest, stability fee, liquidation penalty, etc. Ether Bank however, does not require any kind of interest, fee, or penalty whatsoever. There’s also no due time for paying back the loans in Ether Bank as long as enough collateral has been locked as collateral.
 
-- [What is Ether Bank?](#what-is-ether-bank)
-- [How Does Ether Bank Ensure Stability of Ether Dollar?](#how-does-ether-bank-ensures-stability-of-ether-dollar)
-- [How is Ether Dollar Created or Eliminated?](#how-is-ether-dollar-created-or-eliminated)
-- [What Are the Advantages of Ether Dollar over Other Stablecoins?](#what-are-the-advantages-of-ether-dollar-over-other-stablecoins)
-- [How Does Ether Bank Minimize the Default Risk for Loans?](#how-does-ether-bank-minimize-the-default-risk-for-loans)
-- [Disclaimer](#disclaimer)
-
-### What is Ether Bank?
-* Ether Bank is a smart contract that receives Ether as collateral and provides zero interest loans with no due payback time.  
-* Ether Bank loans helps Ether HODLers pay for their expenditures without having to sell their Ethers.
-* The loans are in form of Ether dollars that are stablecoins created by Ether Bank and backed by Ether.
-* Ether dollar does not depreciate in accordance with the inflations in the United States. 1 Ether dollar is worth as much as the purchasing power of a US dollar in 2014 which was the year Ethereum network initiated. Since US dollar depreciated by 6% during 2014 and 2018, an Ether dollar is worth 1.06 US dollars in 2018.
-
-### How Does Ether Bank Ensure Stability of Ether Dollar?
-* Ether Bank has a simple strategy for maintaining value. It creates Ether dollars to an extent that the supply is equal to the demand in the market. In other words, new Ether dollars are created when demand is increased and existing Ether dollars are eliminated when demand is decreased.
-* Whenever Ether dollar price is higher than the index it is pegged to, it signals that the supply does not suffice the demand at the moment. Consequently, the system has to increase the supply by giving out new loans. Similiarly, when price falls below the index, it is a signal for lower demands, and the system should curb the loaning process.    
-* Unlike other Cryptoassets, newly created tokens are not awarded. They are rather issued as loans. The tokens are created by paying loans and eliminated by settling them.
-* Issuing new tokens by paying loans instead of awarding them enables Ether Bank to maintain the value of Ether dollar by eliminating some of the existing tokens when the demand for them decreases in the market. Elimination is done through settling some of the loans.
+### Ether Dollar as a Stablecoin
+The loans in Ether Bank are paid in Ether dollars which are crypto-collateralized stablecoins. The main advantages of Ether dollar as compared to other crypto-collateralized stablecoins are presented in the following table:
 
 
 
-| Cryptoassets | Ether dollar |
-| ------------ | ------------ |
-| Supply is a function of time | Supply is a function of demand |
-| They are created over time and can never be destroyed after being created | They are created when demand for holding them increases and destroyed when demand decreases |
-| Newly created tokens are awarded, so there is no way to destroy them after creation | Newly created tokens are paid as loans, so they can easily be destroyed by settlement |
-| When demand increases, their market is balanced by the rise of the price | When demand increases, their market is balanced by creation of new tokens |
-| When demand decreases, their market is balanced by the fall of the price | When demand decreases, their market is balanced by destruction of previously created tokens |
-| Supply is stable just like gold | Price is stable just like money |
-
+|              | Other Crypto-collateralized Stablecoins                    | Ether dollar                         |
+| ------------ | ------------                                               | ------------                         |
+| Stability    | Lose value by US dollar inflations                         | Maintains a fixed value              |
+| Cost         | Have token based governance                                | Has an immutable smart contract      |
+|              | Have stability fee and liquidation penalty, etc.           | Has no fees and penalties whatsoever |
+| Simplicity   | Have thousands of code lines                               | Has hundreds of code lines           |
+|              | Have extra tokens besides the collateral and stable tokens | Has no extra tokens                  |
+| Reliability  | Have High default risk                                     | Has low default risk                 |
+|              | Require higher fee and interest in high demands to benefit the investors | Requires higher collateral in high demands to  secure the system |
 
 
 ### How is Ether Dollar Created or Eliminated?
