@@ -20,8 +20,8 @@ The loans in Ether Bank are paid in Ether dollars which are crypto-collateralize
 
 ### Ether Dollar Benefits People
 * Ether dollar makes it possible for people to store value in decentralized money that: 
-   ** Unlike current fiat money has zero inflation.
-   ** Unlike current crypto-assets has no price fall risk in bear market.
+  * Unlike current fiat money has zero inflation.
+  * Unlike current crypto-assets has no price fall risk in bear market.
 
 ### Ether Dollar Benefits ETH HODLers
 * Ether dollar makes it possible for ETH hodlers to receive zero interest loans with no due time in order to deal with their expenses without spending the crypto-assets they own.
