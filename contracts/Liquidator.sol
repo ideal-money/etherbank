@@ -5,15 +5,19 @@ import "./EtherDollar.sol";
 import "./EtherBank.sol";
 
 
+/**
+ * @title EtherBank's Liquidator contract.
+ */
 contract Liquidator is Pausable {
     using SafeMath for uint256;
 
-    EtherDollar public token;
-    EtherBank public bank;
-
     address public owner;
-    address public etherBankAddr;
-    uint256 public lastLiquidationId;
+
+    EtherDollar internal token;
+    EtherBank internal bank;
+
+    address internal etherBankAddr;
+    uint256 internal lastLiquidationId;
 
     enum LiquidationState {
         ACTIVE,
@@ -25,8 +29,8 @@ contract Liquidator is Pausable {
         uint256 loanId;
         uint256 collateralAmount;
         uint256 loanAmount;
-        uint256 startBlock;
-        uint256 endBlock;
+        uint256 startTime;
+        uint256 endTime;
         uint256 bestBid;
         address bestBidder;
         LiquidationState state;
@@ -35,14 +39,15 @@ contract Liquidator is Pausable {
     mapping(uint256 => Liquidation) private liquidations;
     mapping(address => uint256) private deposits;
 
-    event StartLiquidation(uint256 indexed liquidationId, uint256 indexed loanId, uint256 collateralAmount, uint256 loanAmount, uint256 startBlock, uint256 endBlock);
+    event StartLiquidation(uint256 indexed liquidationId, uint256 indexed loanId, uint256 collateralAmount, uint256 loanAmount, uint256 startTime, uint256 endTime);
     event StopLiquidation(uint256 indexed liquidationId, uint256 indexed loanId, uint256 bestBid, address bestBidder);
     event Withdraw(address indexed withdrawalAccount, uint256 amount);
 
     string private constant INVALID_ADDRESS = "INVALID_ADDRESS";
     string private constant ONLY_ETHER_BANK = "ONLY_ETHER_BANK";
+    string private constant NO_DEPOSIT = "NO_DEPOSIT";
     string private constant INVALID_AMOUNT = "INVALID_AMOUNT";
-    string private constant NOT_ACTIVE_LOAN = "NOT_ACTIVE_LOAN";
+    string private constant NOT_ACTIVE_LIQUIDATION = "NOT_ACTIVE_LIQUIDATION";
     string private constant OPEN_LIQUIDATION = "OPEN_LIQUIDATION";
     string private constant NO_BID = "NO_BID";
     string private constant INADEQUATE_BIDDING = "INADEQUATE_BIDDING";
@@ -58,7 +63,7 @@ contract Liquidator is Pausable {
         }
 
     /**
-     * @dev Set EtherBank smart contract address.
+     * @notice Set EtherBank smart contract address.
      * @param _etherBankAddr The EtherBank smart contract address.
      */
     function setEtherBank(address _etherBankAddr)
@@ -72,7 +77,7 @@ contract Liquidator is Pausable {
     }
 
     /**
-     * @dev Set EtherDollar smart contract address.
+     * @notice Set EtherDollar smart contract address.
      * @param _tokenAddr The EtherDollar smart contract address.
      */
     function setEtherDollar(address _tokenAddr)
@@ -85,10 +90,10 @@ contract Liquidator is Pausable {
     }
 
     /**
-     * @dev Get amount of the deposit.
+     * @notice Get amount of the deposit.
      */
     function getDepositAmount()
-        public
+        external
         view
         whenNotPaused
         returns(uint256)
@@ -97,62 +102,59 @@ contract Liquidator is Pausable {
     }
 
     /**
-     * @dev Withdraw EtherDollar.
-     * @param amount The deposite amount.
+     * @notice Withdraw EtherDollar.
      */
-    function withdraw(uint256 amount)
-        public
+    function withdraw()
+        external
         whenNotPaused
-        throwIfEqualToZero(amount)
     {
-        require(amount <= deposits[msg.sender], INVALID_AMOUNT);
-        deposits[msg.sender] -= amount;
-        token.transfer(msg.sender, amount);
+
+        require (deposits[msg.sender] > 0, NO_DEPOSIT);
+        uint256 amount = deposits[msg.sender];
+        deposits[msg.sender] = 0;
         emit Withdraw(msg.sender, amount);
+        token.transfer(msg.sender, amount);
     }
 
     /**
      * @dev Start an liquidation.
-     * @param _numberOfBlocks The number of blocks which liquidation should take.
      * @param _loanId The id of the loan which is under liquidation.
      * @param _collateralAmount The amount of the loan's collateral.
      * @param _loanAmount The amount of the loan's etherDollar.
      */
     function startLiquidation(
-        uint256 _numberOfBlocks,
         uint256 _loanId,
         uint256 _collateralAmount,
         uint256 _loanAmount
     )
-        public
+        external
         whenNotPaused
         onlyEtherBankSC
         throwIfEqualToZero(_collateralAmount)
         throwIfEqualToZero(_loanAmount)
-        throwIfEqualToZero(_numberOfBlocks)
     {
-        uint256 startBlock = block.number;
-        uint256 endBlock = startBlock.add(_numberOfBlocks);
+        uint256 startTime = now;
+        uint256 endTime = startTime + bank.liquidationDuration();
         uint256 liquidationId = ++lastLiquidationId;
         liquidations[liquidationId].loanId = _loanId;
         liquidations[liquidationId].collateralAmount = _collateralAmount;
         liquidations[liquidationId].loanAmount = _loanAmount;
-        liquidations[liquidationId].startBlock = startBlock;
-        liquidations[liquidationId].endBlock = endBlock;
+        liquidations[liquidationId].startTime = startTime;
+        liquidations[liquidationId].endTime = endTime;
         liquidations[liquidationId].state = LiquidationState.ACTIVE;
-        emit StartLiquidation(liquidationId, _loanId, _collateralAmount, _loanAmount, startBlock, endBlock);
+        emit StartLiquidation(liquidationId, _loanId, _collateralAmount, _loanAmount, startTime, endTime);
     }
 
     /**
-     * @dev stop an liquidation.
+     * @notice stop an liquidation.
      * @param liquidationId The id of the liquidation.
      */
     function stopLiquidation(uint256 liquidationId)
-        public
+        external
         checkLiquidationState(liquidationId, LiquidationState.ACTIVE)
         whenNotPaused
     {
-        require(liquidations[liquidationId].endBlock <= block.number, OPEN_LIQUIDATION);
+        require(liquidations[liquidationId].endTime <= now, OPEN_LIQUIDATION);
         require(liquidations[liquidationId].bestBid != 0, NO_BID);
         liquidations[liquidationId].state = LiquidationState.FINISHED;
         token.burn(liquidations[liquidationId].loanAmount);
@@ -165,11 +167,11 @@ contract Liquidator is Pausable {
     }
 
     /**
-     * @dev palce a bid on the liquidation.
+     * @notice palce a bid on the liquidation.
      * @param liquidationId The id of the liquidation.
      */
     function placeBid(uint256 liquidationId, uint256 bidAmount)
-        public
+        external
         whenNotPaused
         checkLiquidationState(liquidationId, LiquidationState.ACTIVE)
     {
@@ -184,11 +186,11 @@ contract Liquidator is Pausable {
     }
 
     /**
-     * @dev Get the best bid of the liquidation.
+     * @notice Get the best bid of the liquidation.
      * @param liquidationId The id of the liquidation.
      */
     function getBestBid(uint256 liquidationId)
-        public
+        external
         view
         whenNotPaused
         returns(address,uint256)
@@ -202,7 +204,7 @@ contract Liquidator is Pausable {
      * @param needState The state which needed.
      */
     modifier checkLiquidationState(uint256 liquidationId, LiquidationState needState) {
-        require(liquidations[liquidationId].state == needState, NOT_ACTIVE_LOAN);
+        require(liquidations[liquidationId].state == needState, NOT_ACTIVE_LIQUIDATION);
         _;
     }
 

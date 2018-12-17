@@ -5,14 +5,19 @@ import "./openzeppelin/contracts/math/SafeMath.sol";
 import "./EtherBank.sol";
 
 
+/**
+ * @title EtherBank's Oracles contract.
+ */
 contract Oracles is Pausable {
     using SafeMath for uint256;
 
-    EtherBank public bank;
+    EtherBank internal bank;
 
     address public owner;
+
     bool public recruitingFinished = false;
-    uint256 public totalScore;
+
+    uint256 private totalScore;
 
     struct Vote {
         uint256 value;
@@ -43,7 +48,6 @@ contract Oracles is Pausable {
     string private constant INVALID_ADDRESS = "INVALID_ADDRESS";
     string private constant RECRUITING_FINISHED = "RECRUITING_FINISHED";
 
-
     constructor(address _etherBankAddr)
         public {
             owner = msg.sender;
@@ -52,7 +56,7 @@ contract Oracles is Pausable {
         }
 
     /**
-     * @dev Set EtherBank smart contract.
+     * @notice Set EtherBank smart contract.
      * @param _etherBankAddr The EtherBank smart contract address.
      */
     function setEtherBank(address _etherBankAddr)
@@ -66,12 +70,12 @@ contract Oracles is Pausable {
     }
 
     /**
-     * @dev Sign a ballot.
+     * @notice Sign a ballot.
      * @param _value The value of a variable.
      * @param _type The variable code.
      */
     function vote(uint8 _type, uint256 _value)
-        public
+        external
         whenNotPaused
     {
         address oracle = msg.sender;
@@ -95,7 +99,7 @@ contract Oracles is Pausable {
     }
 
     /**
-     * @dev Update the EtherBank variable.
+     * @notice Update the EtherBank variable.
      * @param _type The variable code.
      */
     function updateEtherBank(uint8 _type)
@@ -110,7 +114,7 @@ contract Oracles is Pausable {
     }
 
     /**
-     * @dev Manipulate (add/remove/edit score) member of oracles.
+     * @notice Manipulate (add/remove/edit score) member of oracles.
      * @param _account The oracle account.
      * @param _score The score of oracle.
      */
@@ -139,13 +143,14 @@ contract Oracles is Pausable {
     }
 
     /**
-    * @dev Function to stop recruiting new oracle.
+    * @notice Function to stop recruiting new oracle.
     */
     function finishRecruiting()
-    public
-    onlyOwner
-    canRecruiting
-    returns (bool) {
+        external
+        onlyOwner
+        canRecruiting
+        returns (bool)
+    {
         recruitingFinished = true;
         emit FinishRecruiting();
     }
