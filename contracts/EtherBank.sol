@@ -69,6 +69,7 @@ contract EtherBank is Pausable {
     constructor(address _tokenAdd)
         public {
             token = EtherDollar(_tokenAdd);
+            etherDollarAddr = _tokenAdd;
             owner = msg.sender;
             etherPrice = 0; // IN Cent
             depositRate = 1500; // = 1.5
@@ -153,7 +154,6 @@ contract EtherBank is Pausable {
         throwIfEqualToZero(amount)
         enoughCollateral(amount)
     {
-        uint256 weis_per_cent = ETHER_TO_WEI.div(etherPrice);
         uint256 loanId = ++lastLoanId;
         loans[loanId].debtor = msg.sender;
         loans[loanId].collateralAmount = msg.value;

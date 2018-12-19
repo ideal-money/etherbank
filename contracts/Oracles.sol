@@ -118,7 +118,7 @@ contract Oracles is Pausable {
      * @param _account The oracle account.
      * @param _score The score of oracle.
      */
-    function edit(address _account, uint64 _score)
+    function setScore(address _account, uint64 _score)
         external
         onlyOwner
         canRecruiting
