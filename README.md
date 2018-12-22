@@ -1,4 +1,4 @@
-Ether Bank is a decentralized bank on Ethereum. It gives out zero-interest loans for Ether holders. The loans are in paid out as stablecoins called Ether dollars.
+Ether Bank is a decentralized bank on Ethereum. It gives out zero-interest loans for Ether holders. The loans are paid out as stablecoins called Ether dollars.
 
 **Ether Dollar Benefits People**
 
