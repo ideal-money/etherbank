@@ -176,7 +176,7 @@ contract EtherBank is Pausable {
         require(msg.value > 0, COLLATERAL_NOT_ENOUGH);
         require(loans[loanId].state == LoanState.ACTIVE, NOT_ACTIVE_LOAN);
         loans[loanId].collateralAmount.add(msg.value);
-		emit IncreaseCollatral(msg.sender, loanId, msg.value);
+        emit IncreaseCollatral(msg.sender, loanId, msg.value);
     }
 
     /**
@@ -215,6 +215,7 @@ contract EtherBank is Pausable {
         whenNotPaused
     {
         require((loans[loanId].collateralAmount * etherPrice * PRECISION_POINT) < (loans[loanId].amount * depositRate * ETHER_TO_WEI), ENOUGH_COLLATERAL);
+        require(loans[loanId].state == LoanState.ACTIVE, NOT_ACTIVE_LOAN);
         loans[loanId].state = LoanState.UNDER_LIQUIDATION;
         liquidator.startLiquidation(
             loanId,

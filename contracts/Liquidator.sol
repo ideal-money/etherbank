@@ -179,10 +179,11 @@ contract Liquidator is Pausable {
         if (liquidations[liquidationId].bestBid != 0){
             require(bidAmount < liquidations[liquidationId].bestBid, INADEQUATE_BIDDING);
         }
-        token.transferFrom(msg.sender, this, liquidations[liquidationId].loanAmount);
-        deposits[liquidations[liquidationId].bestBidder] += liquidations[liquidationId].loanAmount;
-        liquidations[liquidationId].bestBidder = msg.sender;
-        liquidations[liquidationId].bestBid = bidAmount;
+        if token.transferFrom(msg.sender, this, liquidations[liquidationId].loanAmount){
+            deposits[liquidations[liquidationId].bestBidder] += liquidations[liquidationId].loanAmount;
+            liquidations[liquidationId].bestBidder = msg.sender;
+            liquidations[liquidationId].bestBid = bidAmount;
+        }
     }
 
     /**
