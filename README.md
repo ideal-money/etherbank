@@ -1,4 +1,4 @@
-Ether Bank is a decentralized bank on Ethereum. It gives out zero-interest loans for Ether holders. The loans are in paid out as stablecoins called Ether dollars.
+Ether Bank is a decentralized bank on Ethereum. It gives out zero-interest loans for Ether holders. The loans are paid out as stablecoins called Ether dollars.
 
 **Ether Dollar Benefits People**
 
@@ -28,10 +28,11 @@ The loans in Ether Bank are paid in Ether dollars which are crypto-collateralize
 | Stability    | Lose value by US dollar inflations                         | Maintains a fixed value              |
 | Cost         | Have token based governance                                | Has an immutable smart contract      |
 |              | Have stability fee and liquidation penalty, etc.           | Has no fees and penalties whatsoever |
-| Simplicity   | Have thousands of code lines                               | Has hundreds of code lines           |
+| Simplicity   | Have thousands lines of code                               | Has hundreds lines of code           |
 |              | Have extra tokens besides the collateral and stable tokens | Has no extra tokens                  |
-| Reliability  | Have High default risk                                     | Has low default risk                 |
-|              | Require higher fee and interest in high demands to benefit the investors | Requires higher collateral in high demands to  secure the system |
+| Reliability  | Require higher fee and interest in high demands to benefit the investors | Requires higher collateral in high demands to  secure the system |
+|              | Have Higher default risk                                   | Has lower default risk               |
+
 
 
 ### Stability Mechanism; Simply Put.
