@@ -16,7 +16,7 @@ Moreover, using ETH to back loans not only increases the demand for but also dec
 ### Ether Bank as a Lending Platform
 Current decentralized loan solutions like SALT, Nexo, or MakerDAO require 2.5% to 22% interest, stability fee, liquidation penalty, etc. Ether Bank however, does not require any kind of interest, fee, or penalty whatsoever. There’s also no due time for paying back the loans in Ether Bank as long as enough collateral has been locked as collateral.
 
-![Ether Bank interest rate compared to other decentralized lending platforms](http://idealmoney.io/upload/interest.jpg)
+![Ether Bank interest rate compared to other decentralized lending platforms](http://idealmoney.io/asset/image/compare.jpeg)
 
 ### Ether Dollar as a Stablecoin
 The loans in Ether Bank are paid in Ether dollars which are crypto-collateralized stablecoins. The main advantages of Ether dollar as compared to other crypto-collateralized stablecoins are presented in the following table:
