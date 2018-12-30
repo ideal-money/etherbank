@@ -1,6 +1,6 @@
-pragma solidity ^0.4.22;
+pragma solidity ^0.4.24;
 
-import "./openzeppelin/contracts/lifecycle/Pausable.sol";
+import "./openzeppelin/contracts/ownership/Ownable.sol";
 import "./openzeppelin/contracts/math/SafeMath.sol";
 import "./EtherBank.sol";
 
@@ -8,12 +8,12 @@ import "./EtherBank.sol";
 /**
  * @title EtherBank's Oracles contract.
  */
-contract Oracles is Pausable {
+contract Oracles is Ownable {
     using SafeMath for uint256;
 
-    EtherBank internal bank;
-
     address public owner;
+
+    EtherBank internal bank;
 
     bool public recruitingFinished = false;
 
@@ -30,15 +30,9 @@ contract Oracles is Pausable {
         uint256 No;
     }
 
-    struct Oracle {
-        address account;
-        uint64 score;
-        bool isActive;
-    }
-
     mapping(bytes32 => Vote) private votes;
     mapping(uint8 => Voting) private votings;
-    mapping(address => Oracle) private oracles;
+    mapping(address => uint256) private oracles;
 
     event EditOracles(address oracle, uint256 score);
     event FinishRecruiting();
@@ -47,25 +41,12 @@ contract Oracles is Pausable {
 
     string private constant INVALID_ADDRESS = "INVALID_ADDRESS";
     string private constant RECRUITING_FINISHED = "RECRUITING_FINISHED";
+    string private constant INVALID_SCORE = "INVALID_SCORE";
 
     constructor(address _etherBankAddr)
-        public {
-            owner = msg.sender;
-            totalScore = 0;
-            bank = EtherBank(_etherBankAddr);
-        }
-
-    /**
-     * @notice Set EtherBank smart contract.
-     * @param _etherBankAddr The EtherBank smart contract address.
-     */
-    function setEtherBank(address _etherBankAddr)
-        external
-        onlyOwner
-        whenNotPaused
+        public
     {
-        require(_etherBankAddr != address(0), INVALID_ADDRESS);
-
+        owner = msg.sender;
         bank = EtherBank(_etherBankAddr);
     }
 
@@ -76,24 +57,23 @@ contract Oracles is Pausable {
      */
     function vote(uint8 _type, uint256 _value)
         external
-        whenNotPaused
     {
         address oracle = msg.sender;
-        uint256 score = oracles[oracle].score;
+        uint256 score = oracles[oracle];
         bytes32 votesKey = keccak256(abi.encodePacked(oracle,_type));
         if (votings[_type].No == 0) {
             votings[_type].No++;
         }
         if (votes[votesKey].votingNo == votings[_type].No) {
-            votings[_type].sum -= votes[votesKey].value * score;
-            votings[_type].sumScores -= score;
+            votings[_type].sum = votings[_type].sum.sub(votes[votesKey].value.mul(score));
+            votings[_type].sumScores = votings[_type].sumScores.sub(score);
         }
         votes[votesKey].value = _value;
         votes[votesKey].votingNo = votings[_type].No;
-        votings[_type].sum += (_value.mul(score));
-        votings[_type].sumScores += score;
+        votings[_type].sum = votings[_type].sum.add(_value.mul(score));
+        votings[_type].sumScores = votings[_type].sumScores.add(score);
         emit SetVote(oracle, _type, _value);
-        if ((totalScore / votings[_type].sumScores) < 2) {
+        if (totalScore.div(votings[_type].sumScores) < 2) {
             updateEtherBank(_type);
         }
     }
@@ -105,7 +85,7 @@ contract Oracles is Pausable {
     function updateEtherBank(uint8 _type)
         internal
     {
-        uint256 _value = votings[_type].sum / votings[_type].sumScores;
+        uint256 _value = votings[_type].sum.div(votings[_type].sumScores);
         bank.setVariable(_type, _value);
         votings[_type].sum = 0;
         votings[_type].sumScores = 0;
@@ -118,27 +98,16 @@ contract Oracles is Pausable {
      * @param _account The oracle account.
      * @param _score The score of oracle.
      */
-    function setScore(address _account, uint64 _score)
+    function setScore(address _account, uint256 _score)
         external
         onlyOwner
         canRecruiting
-        whenNotPaused
     {
         require(_account != address(0), INVALID_ADDRESS);
-        if (_score != 0 && !oracles[_account].isActive) {
-            oracles[_account].isActive = true;
-            oracles[_account].score = _score;
-            oracles[_account].account = _account;
-            totalScore += _score;
-        } else if (_score != 0 && oracles[_account].isActive) {
-            totalScore -= oracles[_account].score;
-            totalScore += _score;
-            oracles[_account].score = _score;
-        } else if (_score == 0 && oracles[_account].isActive) {
-            oracles[_account].isActive = false;
-            totalScore -= oracles[_account].score;
-            oracles[_account].score = _score;
-        }
+        require(0 <= _score && _score <= 100, INVALID_SCORE);
+        totalScore = totalScore.sub(oracles[_account]);
+        totalScore = totalScore.add(_score);
+        oracles[_account] = _score;
         emit EditOracles(_account, _score);
     }
 
@@ -149,7 +118,6 @@ contract Oracles is Pausable {
         external
         onlyOwner
         canRecruiting
-        returns (bool)
     {
         recruitingFinished = true;
         emit FinishRecruiting();

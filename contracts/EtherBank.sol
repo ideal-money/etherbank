@@ -1,7 +1,6 @@
-pragma solidity ^0.4.22;
+pragma solidity ^0.4.24;
 
 import "./openzeppelin/contracts/math/SafeMath.sol";
-import "./openzeppelin/contracts/lifecycle/Pausable.sol";
 import "./EtherDollar.sol";
 import "./Liquidator.sol";
 
@@ -9,20 +8,18 @@ import "./Liquidator.sol";
 /**
  * @title EtherBank contract.
  */
-contract EtherBank is Pausable {
+contract EtherBank {
     using SafeMath for uint256;
 
-    address public owner;
+    uint256 public lastLoanId;
+
+    uint256 public etherPrice;
+    uint256 public depositRate;
+    uint256 public liquidationDuration;
 
     address public oracleAddr;
     address public liquidatorAddr;
     address public etherDollarAddr;
-
-    uint256 public lastLoanId;
-
-    uint256 public etherPrice; // cent
-    uint256 public depositRate;
-    uint256 public liquidationDuration; // duration of liquidation in Seconds
 
     EtherDollar internal token;
     Liquidator internal liquidator;
@@ -53,86 +50,78 @@ contract EtherBank is Pausable {
     mapping(uint256 => Loan) private loans;
 
     event LoanGot(address indexed borrower, uint256 indexed loanId, uint256 collateralAmount, uint256 amount);
-    event IncreaseCollatral(address indexed borrower, uint256 indexed loanId, uint256 collateralAmount);
+    event IncreasedCollatral(address indexed borrower, uint256 indexed loanId, uint256 collateralAmount);
     event LoanSettled(address borrower, uint256 indexed loanId, uint256 collateralAmount, uint256 amount);
 
     string private constant INVALID_ADDRESS = "INVALID_ADDRESS";
-    string private constant ONLY_ORACLES = "ONLY_ORACLE";
     string private constant INVALID_AMOUNT = "INVALID_AMOUNT";
-    string private constant COLLATERAL_NOT_ENOUGH = "COLLATERAL_NOT_ENOUGH";
+    string private constant INITIALIZED_BEFORE = "INITIALIZED_BEFORE";
+    string private constant SUFFICIENT_COLLATERAL = "SUFFICIENT_COLLATERAL";
+    string private constant INSUFFICIENT_COLLATERAL = "INSUFFICIENT_COLLATERAL";
+    string private constant INSUFFICIENT_ALLOWANCE = "INSUFFICIENT_ALLOWANCE";
     string private constant ONLY_LOAN_OWNER = "ONLY_LOAN_OWNER";
-    string private constant NOT_ENOUGH_ALLOWANCE = "NOT_ENOUGH_ALLOWANCE";
-    string private constant NOT_ACTIVE_LOAN = "NOT_ACTIVE_LOAN";
-    string private constant ENOUGH_COLLATERAL = "ENOUGH_COLLATERAL";
     string private constant ONLY_LIQUIDATOR = "ONLY_LIQUIDATOR";
+    string private constant ONLY_ORACLES = "ONLY_ORACLE";
+    string private constant INVALID_LOAN_STATE = "INVALID_LOAN_STATE";
+    string private constant EXCEEDED_MAX_LOAN = "EXCEEDED_MAX_LOAN";
 
     constructor(address _tokenAdd)
-        public {
-            token = EtherDollar(_tokenAdd);
-            etherDollarAddr = _tokenAdd;
-            owner = msg.sender;
-            etherPrice = 0; // IN Cent
-            depositRate = 1500; // = 1.5
-            lastLoanId = 0;
-            liquidationDuration = 7200; // IN Seconds
-        }
+        public
+    {
+        token = EtherDollar(_tokenAdd);
+        etherDollarAddr = _tokenAdd;
+        depositRate = 1500; // = 1.5 * PRECISION_POINT
+        liquidationDuration = 7200; // = 2 hours
+    }
 
     /**
      * @dev Fallback function.
      */
-    function() external payable {
-        uint256 amount = msg.value.mul(PRECISION_POINT * etherPrice).div(2 * depositRate * ETHER_TO_WEI);
-        getLoan(amount);
+    function() external
+      payable
+    {
+        if (msg.value > 0) {
+            uint256 amount = msg.value.mul(PRECISION_POINT).mul(etherPrice).div(depositRate).div(ETHER_TO_WEI).div(2);
+            getLoan(amount);
+        }
     }
 
     /**
-     * @notice Set Liquidator smart contract.
-     * @param _liquidatorAddr The Liquidator smart contract address.
+     * @notice Set Liquidator contract.
+     * @param _liquidatorAddr The Liquidator's contract address.
      */
     function setLiquidator(address _liquidatorAddr)
         external
-        onlyOwner
     {
         require(_liquidatorAddr != address(0), INVALID_ADDRESS);
+        require (liquidatorAddr == address(0), INITIALIZED_BEFORE);
 
         liquidatorAddr = _liquidatorAddr;
-        liquidator = Liquidator(liquidatorAddr);
-    }
-
-    /**
-     * @notice Set EtherDollar smart contract address.
-     * @param _tokenAdd The EtherDollar smart contract address.
-     */
-    function setEtherDollar(address _tokenAdd)
-        external
-        onlyOwner
-    {
-        require(_tokenAdd != address(0), INVALID_ADDRESS);
-
-        token = EtherDollar(_tokenAdd);
+        liquidator = Liquidator(_liquidatorAddr);
     }
 
     /**
      * @notice Set oracle address.
-     * @param _oracleAddr The oracle's address.
+     * @param _oracleAddr The oracle's contract address.
      */
     function setOracle(address _oracleAddr)
         external
-        onlyOwner
     {
         require(_oracleAddr != address(0), INVALID_ADDRESS);
+        require (oracleAddr == address(0), INITIALIZED_BEFORE);
 
         oracleAddr = _oracleAddr;
     }
 
     /**
-     * @notice Lets Oracle to set important varibales.
+     * @notice Set important varibales by oracles.
      * @param _type Code of the variable.
      * @param value Amount of the variable.
      */
     function setVariable(uint256 _type, uint256 value)
         external
         onlyOracles
+        throwIfEqualToZero(value)
     {
         if (uint(Types.ETHER_PRICE) == _type) {
             etherPrice = value;
@@ -144,16 +133,17 @@ contract EtherBank is Pausable {
     }
 
     /**
-     * @notice deposit ethereum to borrow etherDollar.
-     * @param amount The amount of requsted loan.
+     * @notice Deposit ether to borrow etherDollar.
+     * @param amount The amount of requsted loan in etherDollar.
      */
     function getLoan(uint256 amount)
         public
         payable
-        whenNotPaused
         throwIfEqualToZero(amount)
-        enoughCollateral(amount)
+        throwIfEqualToZero(msg.value)
     {
+        require (amount <= 1000000, EXCEEDED_MAX_LOAN);
+        require (minCollateral(amount) <= msg.value, INSUFFICIENT_COLLATERAL);
         uint256 loanId = ++lastLoanId;
         loans[loanId].debtor = msg.sender;
         loans[loanId].collateralAmount = msg.value;
@@ -164,58 +154,53 @@ contract EtherBank is Pausable {
     }
 
     /**
-     * @notice increase the loan's collatral.
+     * @notice Increase the loan's collatral.
      * @param loanId The loan id.
      */
     function increaseCollatral(uint256 loanId)
         external
         payable
-        whenNotPaused
-        onlyLoanOwner(loanId)
+        checkLoanState(loanId, LoanState.ACTIVE)
     {
-        require(msg.value > 0, COLLATERAL_NOT_ENOUGH);
-        require(loans[loanId].state == LoanState.ACTIVE, NOT_ACTIVE_LOAN);
-        loans[loanId].collateralAmount.add(msg.value);
-        emit IncreaseCollatral(msg.sender, loanId, msg.value);
+        require(msg.value > 0, INSUFFICIENT_COLLATERAL);
+        loans[loanId].collateralAmount = loans[loanId].collateralAmount.add(msg.value);
+        emit IncreasedCollatral(msg.sender, loanId, msg.value);
     }
 
     /**
-     * @notice payback etherDollars.
+     * @notice payback etherDollars to settle the loan.
      * @param amount The etherDollar amount payed back.
      * @param loanId The loan id.
      */
     function settleLoan(uint256 amount, uint256 loanId)
         external
-        whenNotPaused
-        onlyLoanOwner(loanId)
+        checkLoanState(loanId, LoanState.ACTIVE)
         throwIfEqualToZero(amount)
     {
-        require(amount <= token.allowance(msg.sender, this), NOT_ENOUGH_ALLOWANCE);
+        require(amount <= token.allowance(msg.sender, address(this)), INSUFFICIENT_ALLOWANCE);
         require(amount <= loans[loanId].amount, INVALID_AMOUNT);
-        require(loans[loanId].state == LoanState.ACTIVE, NOT_ACTIVE_LOAN);
         uint256 paybackCollateralAmount = loans[loanId].collateralAmount.mul(amount).div(loans[loanId].amount);
-        if (token.transferFrom(msg.sender, this, amount)) {
+        if (token.transferFrom(msg.sender, address(this), amount)) {
             token.burn(amount);
-            loans[loanId].collateralAmount -= paybackCollateralAmount;
-            loans[loanId].amount -= amount;
+            loans[loanId].collateralAmount = loans[loanId].collateralAmount.sub(paybackCollateralAmount);
+            loans[loanId].amount = loans[loanId].amount.sub(amount);
             if (loans[loanId].amount == 0) {
                 loans[loanId].state = LoanState.SETTLED;
             }
-            emit LoanSettled(msg.sender, loanId, paybackCollateralAmount, amount);
-            msg.sender.transfer(paybackCollateralAmount);
+            emit LoanSettled(loans[loanId].debtor, loanId, paybackCollateralAmount, amount);
+            loans[loanId].debtor.transfer(paybackCollateralAmount);
         }
     }
 
     /**
-     * @notice liquidate collateral of the loan.
+     * @notice Liquidate collateral of the loan.
      * @param loanId The loan id.
      */
     function liquidate(uint256 loanId)
         external
-        whenNotPaused
+        checkLoanState(loanId, LoanState.ACTIVE)
     {
-        require((loans[loanId].collateralAmount * etherPrice * PRECISION_POINT) < (loans[loanId].amount * depositRate * ETHER_TO_WEI), ENOUGH_COLLATERAL);
-        require(loans[loanId].state == LoanState.ACTIVE, NOT_ACTIVE_LOAN);
+        require (minCollateral(loans[loanId].amount) > loans[loanId].collateralAmount, SUFFICIENT_COLLATERAL);
         loans[loanId].state = LoanState.UNDER_LIQUIDATION;
         liquidator.startLiquidation(
             loanId,
@@ -232,13 +217,42 @@ contract EtherBank is Pausable {
      */
     function liquidated(uint256 loanId, uint256 amount, address buyer)
         external
-        whenNotPaused
         onlyLiquidator
+        checkLoanState(loanId, LoanState.UNDER_LIQUIDATION)
     {
+        require (amount <= loans[loanId].collateralAmount, INVALID_AMOUNT);
         loans[loanId].state = LoanState.LIQUIDATED;
-        loans[loanId].collateralAmount -= amount;
+        loans[loanId].collateralAmount = loans[loanId].collateralAmount.sub(amount);
         loans[loanId].amount = 0;
         buyer.transfer(amount);
+    }
+
+    /**
+     * @dev Pay back extera collateral.
+     * @param loanId The loan id.
+     * @param amount The amout of extera colatral.
+     */
+    function withdraw(uint256 loanId, uint256 amount)
+        external
+        onlyLoanOwner(loanId)
+    {
+        require(loans[loanId].state != LoanState.UNDER_LIQUIDATION, INVALID_LOAN_STATE);
+        require(minCollateral(loans[loanId].amount) <= loans[loanId].collateralAmount.sub(amount), INSUFFICIENT_COLLATERAL);
+        loans[loanId].collateralAmount = loans[loanId].collateralAmount.sub(amount);
+        loans[loanId].debtor.transfer(amount);
+    }
+
+    /**
+     * @notice Count minimum wei which is require to borrow `loan` ether dollar.
+     * @param loan The amount of loan in cent.
+     */
+    function minCollateral(uint256 loan)
+        public
+        view
+        returns (uint256)
+    {
+        uint256 min = loan.mul(depositRate).mul(ETHER_TO_WEI).div(PRECISION_POINT).div(etherPrice);
+        return min;
     }
 
     /**
@@ -267,20 +281,21 @@ contract EtherBank is Pausable {
     }
 
     /**
-     * @dev Throws if the collateral is not enough for requested loan.
-     * @param loanAmount The amount of requsted loan.
-     */
-    modifier enoughCollateral(uint256 loanAmount) {
-        require((msg.value * etherPrice * PRECISION_POINT) >= (loanAmount * depositRate * ETHER_TO_WEI), COLLATERAL_NOT_ENOUGH);
-        _;
-    }
-
-    /**
      * @dev Throws if called by any account other than the owner of the loan.
      * @param loanId The loan id.
      */
     modifier onlyLoanOwner(uint256 loanId) {
         require(loans[loanId].debtor == msg.sender, ONLY_LOAN_OWNER);
+        _;
+    }
+
+    /**
+     * @dev Throws if state is not equal to needState.
+     * @param loanId The id of the loan.
+     * @param needState The state which needed.
+     */
+    modifier checkLoanState(uint256 loanId, LoanState needState) {
+        require(loans[loanId].state == needState, INVALID_LOAN_STATE);
         _;
     }
 }

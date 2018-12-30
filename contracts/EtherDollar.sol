@@ -1,4 +1,4 @@
-pragma solidity ^0.4.18;
+pragma solidity ^0.4.24;
 
 import "./openzeppelin/contracts/token/ERC20/MintableToken.sol";
 import "./openzeppelin/contracts/token/ERC20/BurnableToken.sol";
