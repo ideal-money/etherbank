@@ -12,12 +12,10 @@ contract EtherBank {
     using SafeMath for uint256;
 
     uint256 public lastLoanId;
-
     uint256 public etherPrice;
     uint256 public collateralRatio;
     uint256 public liquidationDuration;
-
-    address public oracleAddr;
+    address public oraclesAddr;
     address public liquidatorAddr;
     address public etherDollarAddr;
 
@@ -105,14 +103,14 @@ contract EtherBank {
 
     /**
      * @notice Set oracle's address.
-     * @param _oracleAddr The oracle's contract address.
+     * @param _oraclesAddr The oracle's contract address.
      */
-    function setOracle(address _oracleAddr)
+    function setOracle(address _oraclesAddr)
         external
     {
-        require (oracleAddr == address(0), INITIALIZED_BEFORE);
+        require (oraclesAddr == address(0), INITIALIZED_BEFORE);
 
-        oracleAddr = _oracleAddr;
+        oraclesAddr = _oraclesAddr;
     }
 
     /**
@@ -210,14 +208,14 @@ contract EtherBank {
     }
 
     /**
-     * @notice Liquidate collateral of the loan.
+     * @notice Start liquidation process of the loan.
      * @param loanId The loan id.
      */
     function liquidate(uint256 loanId)
         external
         checkLoanState(loanId, LoanState.ACTIVE)
     {
-        require (minCollateral(loans[loanId].amount) > loans[loanId].collateral, SUFFICIENT_COLLATERAL);
+        require (loans[loanId].collateral < minCollateral(loans[loanId].amount), SUFFICIENT_COLLATERAL);
         loans[loanId].state = LoanState.UNDER_LIQUIDATION;
         liquidator.startLiquidation(
             loanId,
@@ -227,34 +225,34 @@ contract EtherBank {
     }
 
     /**
-     * @dev pay winner of auction's ether.
+     * @dev pay a part of the collateral to the auction's winner.
      * @param loanId The loan id.
-     * @param amount The bid of winner.
+     * @param collateral The bid of winner.
      * @param buyer The winner account.
      */
-    function liquidated(uint256 loanId, uint256 amount, address buyer)
+    function liquidated(uint256 loanId, uint256 collateral, address buyer)
         external
         onlyLiquidator
         checkLoanState(loanId, LoanState.UNDER_LIQUIDATION)
     {
-        require (amount <= loans[loanId].collateral, INVALID_AMOUNT);
+        require (collateral <= loans[loanId].collateral, INVALID_AMOUNT);
         loans[loanId].state = LoanState.LIQUIDATED;
-        loans[loanId].collateral = loans[loanId].collateral.sub(amount);
+        loans[loanId].collateral = loans[loanId].collateral.sub(collateral);
         loans[loanId].amount = 0;
-        buyer.transfer(amount);
+        buyer.transfer(collateral);
     }
 
 
     /**
-     * @notice Count minimum wei which is require to borrow `loan` ether dollar.
-     * @param loan The amount of loan in cent.
+     * @notice Minimum collateral in wei that is required for borrowing `amount` cents.
+     * @param amount The amount of the loan in cents.
      */
-    function minCollateral(uint256 loan)
+    function minCollateral(uint256 amount)
         public
         view
         returns (uint256)
     {
-        uint256 min = loan.mul(collateralRatio).mul(ETHER_TO_WEI).div(PRECISION_POINT).div(etherPrice);
+        uint256 min = amount.mul(collateralRatio).mul(ETHER_TO_WEI).div(PRECISION_POINT).div(etherPrice);
         return min;
     }
 
@@ -262,7 +260,7 @@ contract EtherBank {
      * @dev Throws if called by any account other than our Oracle.
      */
     modifier onlyOracles() {
-        require(msg.sender == oracleAddr, ONLY_ORACLES);
+        require(msg.sender == oraclesAddr, ONLY_ORACLES);
         _;
     }
 
