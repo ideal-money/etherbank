@@ -26,6 +26,8 @@ contract EtherBank {
 
     uint256 constant internal PRECISION_POINT = 10 ** 3;
     uint256 constant internal ETHER_TO_WEI = 10 ** 18;
+    uint256 constant internal MAX_LOAN = 10000 * 100;
+    uint256 constant internal COLLATERAL_MULTIPLIER = 2;
 
     enum Types {
         ETHER_PRICE,
@@ -82,13 +84,13 @@ contract EtherBank {
       payable
     {
         if (msg.value > 0) {
-            uint256 amount = msg.value.mul(PRECISION_POINT).mul(etherPrice).div(collateralRatio).div(ETHER_TO_WEI).div(2);
+            uint256 amount = msg.value.mul(PRECISION_POINT).mul(etherPrice).div(collateralRatio).div(ETHER_TO_WEI).div(COLLATERAL_MULTIPLIER);
             getLoan(amount);
         }
     }
 
     /**
-     * @notice Set Liquidator contract.
+     * @notice Set Liquidator's address.
      * @param _liquidatorAddr The Liquidator's contract address.
      */
     function setLiquidator(address _liquidatorAddr)
@@ -101,7 +103,7 @@ contract EtherBank {
     }
 
     /**
-     * @notice Set oracle address.
+     * @notice Set oracle's address.
      * @param _oracleAddr The oracle's contract address.
      */
     function setOracle(address _oracleAddr)
@@ -114,7 +116,7 @@ contract EtherBank {
 
     /**
      * @notice Set important varibales by oracles.
-     * @param _type Code of the variable.
+     * @param _type Type of the variable.
      * @param value Amount of the variable.
      */
     function setVariable(uint8 _type, uint256 value)
@@ -132,8 +134,8 @@ contract EtherBank {
     }
 
     /**
-     * @notice Deposit ether to borrow etherDollar.
-     * @param amount The amount of requsted loan in etherDollar.
+     * @notice Deposit ether to borrow ether dollar.
+     * @param amount The amount of requsted loan in ether dollar.
      */
     function getLoan(uint256 amount)
         public
