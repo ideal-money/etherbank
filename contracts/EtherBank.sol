@@ -220,7 +220,8 @@ contract EtherBank {
         liquidator.startLiquidation(
             loanId,
             loans[loanId].collateral,
-            loans[loanId].amount
+            loans[loanId].amount,
+            liquidationDuration
         );
     }
 

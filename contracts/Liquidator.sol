@@ -23,8 +23,8 @@ contract Liquidator {
 
     struct Liquidation {
         uint256 loanId;
-        uint256 collateralAmount;
-        uint256 loanAmount;
+        uint256 collateral;
+        uint256 amount;
         uint256 startTime;
         uint256 endTime;
         uint256 bestBid;
@@ -32,12 +32,12 @@ contract Liquidator {
         LiquidationState state;
     }
 
-    mapping(uint256 => Liquidation) private liquidations;
-    mapping(address => uint256) private deposits;
+    mapping(uint256 => Liquidation) public liquidations;
+    mapping(address => uint256) public deposits;
 
-    event StartLiquidation(uint256 indexed liquidationId, uint256 indexed loanId, uint256 collateralAmount, uint256 loanAmount, uint256 startTime, uint256 endTime);
-    event StopLiquidation(uint256 indexed liquidationId, uint256 indexed loanId, uint256 bestBid, address bestBidder);
-    event Withdraw(address indexed withdrawalAccount, uint256 amount);
+    event LiquidationStarted(uint256 indexed liquidationId, uint256 indexed loanId, uint256 collateral, uint256 amount, uint256 startTime, uint256 endTime);
+    event LiquidationStopped(uint256 indexed liquidationId, uint256 indexed loanId, uint256 bestBid, address bestBidder);
+    event Withdrew(address indexed withdrawalAccount, uint256 amount);
 
     string private constant ONLY_ETHER_BANK = "ONLY_ETHER_BANK";
     string private constant NO_DEPOSIT = "NO_DEPOSIT";
@@ -56,24 +56,13 @@ contract Liquidator {
     }
 
     /**
-     * @notice Get amount of the deposit.
-     */
-    function getDepositAmount()
-        external
-        view
-        returns(uint256)
-    {
-        return deposits[msg.sender];
-    }
-
-    /**
-     * @notice Withdraw EtherDollar.
+     * @notice Withdrew EtherDollar.
      */
     function withdraw()
         external
     {
-
         require (deposits[msg.sender] > 0, NO_DEPOSIT);
+
         uint256 amount = deposits[msg.sender];
         deposits[msg.sender] = 0;
         emit Withdraw(msg.sender, amount);
@@ -82,30 +71,32 @@ contract Liquidator {
 
     /**
      * @dev Start a liquidation.
-     * @param _loanId The id of the loan which is under liquidation.
-     * @param _collateralAmount The amount of the loan's collateral.
-     * @param _loanAmount The amount of the loan.
+     * @param loadId The id of the loan which is under liquidation.
+     * @param collateral The amount of the loan's collateral.
+     * @param amount The amount of the loan.
+     * @param duration The duration of the liquidation.
      */
     function startLiquidation(
-        uint256 _loanId,
-        uint256 _collateralAmount,
-        uint256 _loanAmount
+        uint256 loadId,
+        uint256 collateral,
+        uint256 amount,
+        uint256 duration
     )
         external
         onlyEtherBank
-        throwIfEqualToZero(_collateralAmount)
-        throwIfEqualToZero(_loanAmount)
+        throwIfEqualToZero(collateral)
+        throwIfEqualToZero(amount)
     {
         uint256 liquidationId = ++lastLiquidationId;
         uint256 startTime = now;
-        uint256 endTime = startTime.add(bank.liquidationDuration());
-        liquidations[liquidationId].loanId = _loanId;
-        liquidations[liquidationId].collateralAmount = _collateralAmount;
-        liquidations[liquidationId].loanAmount = _loanAmount;
+        uint256 endTime = startTime.add(duration);
+        liquidations[liquidationId].loanId = loadId;
+        liquidations[liquidationId].collateral = collateral;
+        liquidations[liquidationId].amount = amount;
         liquidations[liquidationId].startTime = startTime;
         liquidations[liquidationId].endTime = endTime;
         liquidations[liquidationId].state = LiquidationState.ACTIVE;
-        emit StartLiquidation(liquidationId, _loanId, _collateralAmount, _loanAmount, startTime, endTime);
+        emit LiquidationStarted(liquidationId, loadId, collateral, amount, startTime, endTime);
     }
 
     /**
@@ -119,8 +110,8 @@ contract Liquidator {
         require(liquidations[liquidationId].endTime <= now, OPEN_LIQUIDATION);
         require(liquidations[liquidationId].bestBid != 0, NO_BID);
         liquidations[liquidationId].state = LiquidationState.FINISHED;
-        token.burn(liquidations[liquidationId].loanAmount);
-        emit StopLiquidation(liquidationId, liquidations[liquidationId].loanId, liquidations[liquidationId].bestBid, liquidations[liquidationId].bestBidder);
+        token.burn(liquidations[liquidationId].amount);
+        emit LiquidationStopped(liquidationId, liquidations[liquidationId].loanId, liquidations[liquidationId].bestBid, liquidations[liquidationId].bestBidder);
         bank.liquidated(
             liquidations[liquidationId].loanId,
             liquidations[liquidationId].bestBid,
@@ -136,15 +127,15 @@ contract Liquidator {
         external
         checkLiquidationState(liquidationId, LiquidationState.ACTIVE)
     {
-        require(bidAmount <= liquidations[liquidationId].collateralAmount, INADEQUATE_BIDDING);
-        require(liquidations[liquidationId].loanAmount <= token.allowance(msg.sender, address(this)).add(deposits[msg.sender]), INSUFFICIENT_FUNDS);
+        require(bidAmount <= liquidations[liquidationId].collateral, INADEQUATE_BIDDING);
+        require(liquidations[liquidationId].amount <= token.allowance(msg.sender, address(this)).add(deposits[msg.sender]), INSUFFICIENT_FUNDS);
         if (liquidations[liquidationId].bestBid != 0){
             require(bidAmount < liquidations[liquidationId].bestBid, INADEQUATE_BIDDING);
         }
         uint256 allowance = token.allowance(msg.sender, address(this));
         if (token.transferFrom(msg.sender, address(this), allowance)) {
-            deposits[msg.sender] = deposits[msg.sender].add(allowance).sub(liquidations[liquidationId].loanAmount);
-            deposits[liquidations[liquidationId].bestBidder] = deposits[liquidations[liquidationId].bestBidder].add(liquidations[liquidationId].loanAmount);
+            deposits[msg.sender] = deposits[msg.sender].add(allowance).sub(liquidations[liquidationId].amount);
+            deposits[liquidations[liquidationId].bestBidder] = deposits[liquidations[liquidationId].bestBidder].add(liquidations[liquidationId].amount);
             liquidations[liquidationId].bestBidder = msg.sender;
             liquidations[liquidationId].bestBid = bidAmount;
         }
