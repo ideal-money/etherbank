@@ -102,7 +102,7 @@ contract Liquidator {
      */
     function stopLiquidation(uint256 liquidationId)
         external
-        checkLiquidationState(liquidationId, LiquidationState.ACTIVE)
+        onlyActive(liquidationId)
     {
         require(liquidations[liquidationId].endTime <= now, OPEN_LIQUIDATION);
         require(liquidations[liquidationId].bestBid != 0, NO_BID);
@@ -122,32 +122,21 @@ contract Liquidator {
      */
     function placeBid(uint256 liquidationId, uint256 bidAmount)
         external
-        checkLiquidationState(liquidationId, LiquidationState.ACTIVE)
+        onlyActive(liquidationId)
     {
         require(bidAmount <= liquidations[liquidationId].collateral, INADEQUATE_BIDDING);
-        require(liquidations[liquidationId].amount <= token.allowance(msg.sender, address(this)).add(deposits[msg.sender]), INSUFFICIENT_FUNDS);
         if (liquidations[liquidationId].bestBid != 0){
             require(bidAmount < liquidations[liquidationId].bestBid, INADEQUATE_BIDDING);
         }
         uint256 allowance = token.allowance(msg.sender, address(this));
         if (token.transferFrom(msg.sender, address(this), allowance)) {
-            deposits[msg.sender] = deposits[msg.sender].add(allowance).sub(liquidations[liquidationId].amount);
-            deposits[liquidations[liquidationId].bestBidder] = deposits[liquidations[liquidationId].bestBidder].add(liquidations[liquidationId].amount);
-            liquidations[liquidationId].bestBidder = msg.sender;
-            liquidations[liquidationId].bestBid = bidAmount;
+            deposits[msg.sender] = deposits[msg.sender].add(allowance);
         }
-    }
-
-    /**
-     * @notice Get the best bid of the liquidation.
-     * @param liquidationId The id of the liquidation.
-     */
-    function getBestBid(uint256 liquidationId)
-        external
-        view
-        returns(address,uint256)
-    {
-        return (liquidations[liquidationId].bestBidder, liquidations[liquidationId].bestBid);
+        require(liquidations[liquidationId].amount <= deposits[msg.sender], INSUFFICIENT_FUNDS);
+        deposits[msg.sender] = deposits[msg.sender].sub(liquidations[liquidationId].amount);
+        deposits[liquidations[liquidationId].bestBidder] = deposits[liquidations[liquidationId].bestBidder].add(liquidations[liquidationId].amount);
+        liquidations[liquidationId].bestBidder = msg.sender;
+        liquidations[liquidationId].bestBid = bidAmount;
     }
 
     /**
@@ -155,8 +144,8 @@ contract Liquidator {
      * @param liquidationId The id of the liquidation.
      * @param needState The state which needed.
      */
-    modifier checkLiquidationState(uint256 liquidationId, LiquidationState needState) {
-        require(liquidations[liquidationId].state == needState, NOT_ACTIVE_LIQUIDATION);
+    modifier onlyActive(uint256 liquidationId) {
+        require(liquidations[liquidationId].state == LiquidationState.ACTIVE, NOT_ACTIVE_LIQUIDATION);
         _;
     }
 
