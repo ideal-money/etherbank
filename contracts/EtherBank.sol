@@ -43,7 +43,7 @@ contract EtherBank {
     }
 
     struct Loan {
-        address debtor;
+        address recipient;
         uint256 collateral;
         uint256 amount;
         LoanState state;
@@ -51,10 +51,10 @@ contract EtherBank {
 
     mapping(uint256 => Loan) private loans;
 
-    event LoanGot(address indexed borrower, uint256 indexed loanId, uint256 collateral, uint256 amount);
-    event LoanSettled(address borrower, uint256 indexed loanId, uint256 collateral, uint256 amount);
-    event CollateralIncreased(address indexed borrower, uint256 indexed loanId, uint256 collateral);
-    event CollateralDecreased(address indexed borrower, uint256 indexed loanId, uint256 collateral);
+    event LoanGot(address indexed recipient, uint256 indexed loanId, uint256 collateral, uint256 amount);
+    event LoanSettled(address recipient, uint256 indexed loanId, uint256 collateral, uint256 amount);
+    event CollateralIncreased(address indexed recipient, uint256 indexed loanId, uint256 collateral);
+    event CollateralDecreased(address indexed recipient, uint256 indexed loanId, uint256 collateral);
 
     string private constant INVALID_ADDRESS = "INVALID_ADDRESS";
     string private constant INVALID_AMOUNT = "INVALID_AMOUNT";
@@ -147,7 +147,7 @@ contract EtherBank {
         require (amount <= MAX_LOAN, EXCEEDED_MAX_LOAN);
         require (minCollateral(amount) <= msg.value, INSUFFICIENT_COLLATERAL);
         uint256 loanId = ++lastLoanId;
-        loans[loanId].debtor = msg.sender;
+        loans[loanId].recipient = msg.sender;
         loans[loanId].collateral = msg.value;
         loans[loanId].amount = amount;
         loans[loanId].state = LoanState.ACTIVE;
@@ -183,32 +183,30 @@ contract EtherBank {
         require(minCollateral(loans[loanId].amount) <= loans[loanId].collateral.sub(amount), INSUFFICIENT_COLLATERAL);
         loans[loanId].collateral = loans[loanId].collateral.sub(amount);
         emit CollateralDecreased(msg.sender, loanId, amount);
-        loans[loanId].debtor.transfer(amount);
+        loans[loanId].recipient.transfer(amount);
     }
 
     /**
      * @notice pay ether dollars back to settle the loan.
-     * @param amount The ether dollar amount payed back.
      * @param loanId The loan id.
+     * @param amount The ether dollar amount payed back.
      */
-    function settleLoan(uint256 amount, uint256 loanId)
+    function settleLoan(uint256 loanId, uint256 amount)
         external
         checkLoanState(loanId, LoanState.ACTIVE)
         throwIfEqualToZero(amount)
     {
-        require(amount <= token.allowance(msg.sender, address(this)), INSUFFICIENT_ALLOWANCE);
         require(amount <= loans[loanId].amount, INVALID_AMOUNT);
-        uint256 paybackCollateralAmount = loans[loanId].collateral.mul(amount).div(loans[loanId].amount);
-        if (token.transferFrom(msg.sender, address(this), amount)) {
-            token.burn(amount);
-            loans[loanId].collateral = loans[loanId].collateral.sub(paybackCollateralAmount);
-            loans[loanId].amount = loans[loanId].amount.sub(amount);
-            if (loans[loanId].amount == 0) {
-                loans[loanId].state = LoanState.SETTLED;
-            }
-            emit LoanSettled(loans[loanId].debtor, loanId, paybackCollateralAmount, amount);
-            loans[loanId].debtor.transfer(paybackCollateralAmount);
+        require(token.transferFrom(msg.sender, address(this), amount), INSUFFICIENT_ALLOWANCE);
+        uint256 payback = loans[loanId].collateral.mul(amount).div(loans[loanId].amount);
+        token.burn(amount);
+        loans[loanId].collateral = loans[loanId].collateral.sub(payback);
+        loans[loanId].amount = loans[loanId].amount.sub(amount);
+        if (loans[loanId].amount == 0) {
+            loans[loanId].state = LoanState.SETTLED;
         }
+        emit LoanSettled(loans[loanId].recipient, loanId, payback, amount);
+        loans[loanId].recipient.transfer(payback);
     }
 
     /**
@@ -290,7 +288,7 @@ contract EtherBank {
      * @param loanId The loan id.
      */
     modifier onlyLoanOwner(uint256 loanId) {
-        require(loans[loanId].debtor == msg.sender, ONLY_LOAN_OWNER);
+        require(loans[loanId].recipient == msg.sender, ONLY_LOAN_OWNER);
         _;
     }
 
