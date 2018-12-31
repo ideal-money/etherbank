@@ -117,16 +117,16 @@ contract EtherBank {
      * @param _type Code of the variable.
      * @param value Amount of the variable.
      */
-    function setVariable(uint256 _type, uint256 value)
+    function setVariable(uint8 _type, uint256 value)
         external
         onlyOracles
         throwIfEqualToZero(value)
     {
-        if (uint(Types.ETHER_PRICE) == _type) {
+        if (uint8(Types.ETHER_PRICE) == _type) {
             etherPrice = value;
-        } else if (uint(Types.COLLATERAL_RATIO) == _type) {
+        } else if (uint8(Types.COLLATERAL_RATIO) == _type) {
             collateralRatio = value;
-        } else if (uint(Types.LIQUIDATION_DURATION) == _type) {
+        } else if (uint8(Types.LIQUIDATION_DURATION) == _type) {
             liquidationDuration = value;
         }
     }
