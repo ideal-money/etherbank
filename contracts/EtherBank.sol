@@ -75,6 +75,7 @@ contract EtherBank {
     }
 
     /**
+     * @notice Gives out as much as half the maximum loan you can possibly receive from the smart contract
      * @dev Fallback function.
      */
     function() external
@@ -93,8 +94,7 @@ contract EtherBank {
     function setLiquidator(address _liquidatorAddr)
         external
     {
-        require(_liquidatorAddr != address(0), INVALID_ADDRESS);
-        require (liquidatorAddr == address(0), INITIALIZED_BEFORE);
+        require(liquidatorAddr == address(0), INITIALIZED_BEFORE);
 
         liquidatorAddr = _liquidatorAddr;
         liquidator = Liquidator(_liquidatorAddr);
@@ -107,7 +107,6 @@ contract EtherBank {
     function setOracle(address _oracleAddr)
         external
     {
-        require(_oracleAddr != address(0), INVALID_ADDRESS);
         require (oracleAddr == address(0), INITIALIZED_BEFORE);
 
         oracleAddr = _oracleAddr;
