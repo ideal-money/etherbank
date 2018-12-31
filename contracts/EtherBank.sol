@@ -52,8 +52,9 @@ contract EtherBank {
     mapping(uint256 => Loan) private loans;
 
     event LoanGot(address indexed borrower, uint256 indexed loanId, uint256 collateral, uint256 amount);
-    event IncreasedCollatral(address indexed borrower, uint256 indexed loanId, uint256 collateral);
     event LoanSettled(address borrower, uint256 indexed loanId, uint256 collateral, uint256 amount);
+    event CollateralIncreased(address indexed borrower, uint256 indexed loanId, uint256 collateral);
+    event CollateralDecreased(address indexed borrower, uint256 indexed loanId, uint256 collateral);
 
     string private constant INVALID_ADDRESS = "INVALID_ADDRESS";
     string private constant INVALID_AMOUNT = "INVALID_AMOUNT";
@@ -155,22 +156,39 @@ contract EtherBank {
     }
 
     /**
-     * @notice Increase the loan's collatral.
+     * @notice Increase the loan's collateral.
      * @param loanId The loan id.
      */
-    function increaseCollatral(uint256 loanId)
+    function increaseCollateral(uint256 loanId)
         external
         payable
+        throwIfEqualToZero(msg.value)
         checkLoanState(loanId, LoanState.ACTIVE)
     {
-        require(msg.value > 0, INSUFFICIENT_COLLATERAL);
         loans[loanId].collateral = loans[loanId].collateral.add(msg.value);
-        emit IncreasedCollatral(msg.sender, loanId, msg.value);
+        emit CollateralIncreased(msg.sender, loanId, msg.value);
     }
 
     /**
-     * @notice payback etherDollars to settle the loan.
-     * @param amount The etherDollar amount payed back.
+     * @notice Pay back extera collateral.
+     * @param loanId The loan id.
+     * @param amount The amout of extera colatral.
+     */
+    function decreaseCollateral(uint256 loanId, uint256 amount)
+        external
+        throwIfEqualToZero(amount)
+        onlyLoanOwner(loanId)
+    {
+        require(loans[loanId].state != LoanState.UNDER_LIQUIDATION, INVALID_LOAN_STATE);
+        require(minCollateral(loans[loanId].amount) <= loans[loanId].collateral.sub(amount), INSUFFICIENT_COLLATERAL);
+        loans[loanId].collateral = loans[loanId].collateral.sub(amount);
+        emit CollateralDecreased(msg.sender, loanId, amount);
+        loans[loanId].debtor.transfer(amount);
+    }
+
+    /**
+     * @notice pay ether dollars back to settle the loan.
+     * @param amount The ether dollar amount payed back.
      * @param loanId The loan id.
      */
     function settleLoan(uint256 amount, uint256 loanId)
@@ -228,20 +246,6 @@ contract EtherBank {
         buyer.transfer(amount);
     }
 
-    /**
-     * @dev Pay back extera collateral.
-     * @param loanId The loan id.
-     * @param amount The amout of extera colatral.
-     */
-    function withdraw(uint256 loanId, uint256 amount)
-        external
-        onlyLoanOwner(loanId)
-    {
-        require(loans[loanId].state != LoanState.UNDER_LIQUIDATION, INVALID_LOAN_STATE);
-        require(minCollateral(loans[loanId].amount) <= loans[loanId].collateral.sub(amount), INSUFFICIENT_COLLATERAL);
-        loans[loanId].collateral = loans[loanId].collateral.sub(amount);
-        loans[loanId].debtor.transfer(amount);
-    }
 
     /**
      * @notice Count minimum wei which is require to borrow `loan` ether dollar.
