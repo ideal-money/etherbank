@@ -44,16 +44,16 @@ contract EtherBank {
 
     struct Loan {
         address debtor;
-        uint256 collateralAmount;
+        uint256 collateral;
         uint256 amount;
         LoanState state;
     }
 
     mapping(uint256 => Loan) private loans;
 
-    event LoanGot(address indexed borrower, uint256 indexed loanId, uint256 collateralAmount, uint256 amount);
-    event IncreasedCollatral(address indexed borrower, uint256 indexed loanId, uint256 collateralAmount);
-    event LoanSettled(address borrower, uint256 indexed loanId, uint256 collateralAmount, uint256 amount);
+    event LoanGot(address indexed borrower, uint256 indexed loanId, uint256 collateral, uint256 amount);
+    event IncreasedCollatral(address indexed borrower, uint256 indexed loanId, uint256 collateral);
+    event LoanSettled(address borrower, uint256 indexed loanId, uint256 collateral, uint256 amount);
 
     string private constant INVALID_ADDRESS = "INVALID_ADDRESS";
     string private constant INVALID_AMOUNT = "INVALID_AMOUNT";
@@ -147,7 +147,7 @@ contract EtherBank {
         require (minCollateral(amount) <= msg.value, INSUFFICIENT_COLLATERAL);
         uint256 loanId = ++lastLoanId;
         loans[loanId].debtor = msg.sender;
-        loans[loanId].collateralAmount = msg.value;
+        loans[loanId].collateral = msg.value;
         loans[loanId].amount = amount;
         loans[loanId].state = LoanState.ACTIVE;
         emit LoanGot(msg.sender, loanId, msg.value, amount);
@@ -164,7 +164,7 @@ contract EtherBank {
         checkLoanState(loanId, LoanState.ACTIVE)
     {
         require(msg.value > 0, INSUFFICIENT_COLLATERAL);
-        loans[loanId].collateralAmount = loans[loanId].collateralAmount.add(msg.value);
+        loans[loanId].collateral = loans[loanId].collateral.add(msg.value);
         emit IncreasedCollatral(msg.sender, loanId, msg.value);
     }
 
@@ -180,10 +180,10 @@ contract EtherBank {
     {
         require(amount <= token.allowance(msg.sender, address(this)), INSUFFICIENT_ALLOWANCE);
         require(amount <= loans[loanId].amount, INVALID_AMOUNT);
-        uint256 paybackCollateralAmount = loans[loanId].collateralAmount.mul(amount).div(loans[loanId].amount);
+        uint256 paybackCollateralAmount = loans[loanId].collateral.mul(amount).div(loans[loanId].amount);
         if (token.transferFrom(msg.sender, address(this), amount)) {
             token.burn(amount);
-            loans[loanId].collateralAmount = loans[loanId].collateralAmount.sub(paybackCollateralAmount);
+            loans[loanId].collateral = loans[loanId].collateral.sub(paybackCollateralAmount);
             loans[loanId].amount = loans[loanId].amount.sub(amount);
             if (loans[loanId].amount == 0) {
                 loans[loanId].state = LoanState.SETTLED;
@@ -201,11 +201,11 @@ contract EtherBank {
         external
         checkLoanState(loanId, LoanState.ACTIVE)
     {
-        require (minCollateral(loans[loanId].amount) > loans[loanId].collateralAmount, SUFFICIENT_COLLATERAL);
+        require (minCollateral(loans[loanId].amount) > loans[loanId].collateral, SUFFICIENT_COLLATERAL);
         loans[loanId].state = LoanState.UNDER_LIQUIDATION;
         liquidator.startLiquidation(
             loanId,
-            loans[loanId].collateralAmount,
+            loans[loanId].collateral,
             loans[loanId].amount
         );
     }
@@ -221,9 +221,9 @@ contract EtherBank {
         onlyLiquidator
         checkLoanState(loanId, LoanState.UNDER_LIQUIDATION)
     {
-        require (amount <= loans[loanId].collateralAmount, INVALID_AMOUNT);
+        require (amount <= loans[loanId].collateral, INVALID_AMOUNT);
         loans[loanId].state = LoanState.LIQUIDATED;
-        loans[loanId].collateralAmount = loans[loanId].collateralAmount.sub(amount);
+        loans[loanId].collateral = loans[loanId].collateral.sub(amount);
         loans[loanId].amount = 0;
         buyer.transfer(amount);
     }
@@ -238,8 +238,8 @@ contract EtherBank {
         onlyLoanOwner(loanId)
     {
         require(loans[loanId].state != LoanState.UNDER_LIQUIDATION, INVALID_LOAN_STATE);
-        require(minCollateral(loans[loanId].amount) <= loans[loanId].collateralAmount.sub(amount), INSUFFICIENT_COLLATERAL);
-        loans[loanId].collateralAmount = loans[loanId].collateralAmount.sub(amount);
+        require(minCollateral(loans[loanId].amount) <= loans[loanId].collateral.sub(amount), INSUFFICIENT_COLLATERAL);
+        loans[loanId].collateral = loans[loanId].collateral.sub(amount);
         loans[loanId].debtor.transfer(amount);
     }
 
