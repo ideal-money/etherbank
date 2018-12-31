@@ -14,7 +14,7 @@ contract EtherBank {
     uint256 public lastLoanId;
 
     uint256 public etherPrice;
-    uint256 public depositRate;
+    uint256 public collateralRatio;
     uint256 public liquidationDuration;
 
     address public oracleAddr;
@@ -29,7 +29,7 @@ contract EtherBank {
 
     enum Types {
         ETHER_PRICE,
-        DEPOSIT_RATE,
+        COLLATERAL_RATIO,
         LIQUIDATION_DURATION
     }
 
@@ -70,7 +70,7 @@ contract EtherBank {
     {
         token = EtherDollar(_tokenAdd);
         etherDollarAddr = _tokenAdd;
-        depositRate = 1500; // = 1.5 * PRECISION_POINT
+        collateralRatio = 1500; // = 1.5 * PRECISION_POINT
         liquidationDuration = 7200; // = 2 hours
     }
 
@@ -82,7 +82,7 @@ contract EtherBank {
       payable
     {
         if (msg.value > 0) {
-            uint256 amount = msg.value.mul(PRECISION_POINT).mul(etherPrice).div(depositRate).div(ETHER_TO_WEI).div(2);
+            uint256 amount = msg.value.mul(PRECISION_POINT).mul(etherPrice).div(collateralRatio).div(ETHER_TO_WEI).div(2);
             getLoan(amount);
         }
     }
@@ -124,8 +124,8 @@ contract EtherBank {
     {
         if (uint(Types.ETHER_PRICE) == _type) {
             etherPrice = value;
-        } else if (uint(Types.DEPOSIT_RATE) == _type) {
-            depositRate = value;
+        } else if (uint(Types.COLLATERAL_RATIO) == _type) {
+            collateralRatio = value;
         } else if (uint(Types.LIQUIDATION_DURATION) == _type) {
             liquidationDuration = value;
         }
@@ -250,7 +250,7 @@ contract EtherBank {
         view
         returns (uint256)
     {
-        uint256 min = loan.mul(depositRate).mul(ETHER_TO_WEI).div(PRECISION_POINT).div(etherPrice);
+        uint256 min = loan.mul(collateralRatio).mul(ETHER_TO_WEI).div(PRECISION_POINT).div(etherPrice);
         return min;
     }
 
