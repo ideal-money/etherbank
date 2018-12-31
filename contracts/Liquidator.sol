@@ -140,9 +140,8 @@ contract Liquidator {
     }
 
     /**
-     * @dev Throws if state is not equal to needState.
+     * @dev Throws if the liquidation is not active.
      * @param liquidationId The id of the liquidation.
-     * @param needState The state which needed.
      */
     modifier onlyActive(uint256 liquidationId) {
         require(liquidations[liquidationId].state == LiquidationState.ACTIVE, NOT_ACTIVE_LIQUIDATION);
