@@ -143,7 +143,7 @@ contract EtherBank {
         throwIfEqualToZero(amount)
         throwIfEqualToZero(msg.value)
     {
-        require (amount <= 1000000, EXCEEDED_MAX_LOAN);
+        require (amount <= MAX_LOAN, EXCEEDED_MAX_LOAN);
         require (minCollateral(amount) <= msg.value, INSUFFICIENT_COLLATERAL);
         uint256 loanId = ++lastLoanId;
         loans[loanId].debtor = msg.sender;
