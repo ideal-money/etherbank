@@ -25,7 +25,6 @@ contract Liquidator {
         uint256 loanId;
         uint256 collateral;
         uint256 amount;
-        uint256 startTime;
         uint256 endTime;
         uint256 bestBid;
         address bestBidder;
@@ -35,7 +34,7 @@ contract Liquidator {
     mapping(uint256 => Liquidation) public liquidations;
     mapping(address => uint256) public deposits;
 
-    event LiquidationStarted(uint256 indexed liquidationId, uint256 indexed loanId, uint256 collateral, uint256 amount, uint256 startTime, uint256 endTime);
+    event LiquidationStarted(uint256 indexed liquidationId, uint256 indexed loanId, uint256 collateral, uint256 amount, uint256 endTime);
     event LiquidationStopped(uint256 indexed liquidationId, uint256 indexed loanId, uint256 bestBid, address bestBidder);
     event Withdrew(address indexed withdrawalAccount, uint256 amount);
 
@@ -88,15 +87,13 @@ contract Liquidator {
         throwIfEqualToZero(amount)
     {
         uint256 liquidationId = ++lastLiquidationId;
-        uint256 startTime = now;
-        uint256 endTime = startTime.add(duration);
+        uint256 endTime = duration.add(now);
         liquidations[liquidationId].loanId = loadId;
         liquidations[liquidationId].collateral = collateral;
         liquidations[liquidationId].amount = amount;
-        liquidations[liquidationId].startTime = startTime;
         liquidations[liquidationId].endTime = endTime;
         liquidations[liquidationId].state = LiquidationState.ACTIVE;
-        emit LiquidationStarted(liquidationId, loadId, collateral, amount, startTime, endTime);
+        emit LiquidationStarted(liquidationId, loadId, collateral, amount, endTime);
     }
 
     /**
