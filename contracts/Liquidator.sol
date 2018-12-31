@@ -64,7 +64,7 @@ contract Liquidator {
 
         uint256 amount = deposits[msg.sender];
         deposits[msg.sender] = 0;
-        emit Withdraw(msg.sender, amount);
+        emit Withdrew(msg.sender, amount);
         token.transfer(msg.sender, amount);
     }
 
