@@ -19,7 +19,8 @@ Current decentralized loan solutions like SALT, Nexo, or MakerDAO require 2.5% t
 ![Ether Bank interest rate compared to other decentralized lending platforms](http://idealmoney.io/asset/image/interest.jpg)
 
 ### Ether Dollar as a Stablecoin
-The loans in Ether Bank are paid in Ether dollars which are crypto-collateralized stablecoins. The main advantages of Ether dollar as compared to other crypto-collateralized stablecoins are presented in the following table:
+The loans in Ether Bank are paid in Ether dollars which are crypto-collateralized stablecoins. Ether dollar does not depreciate in accordance with the inflations in the United States. 1 Ether dollar is worth as much as the purchasing power of a US dollar in 2009 which with the start of Bitcoin was the starting point of money decentralization. Since US dollar depreciated by 19% from 2009 to 2019, an Ether dollar is worth 1.19 US dollars in 2019.
+The main advantages of Ether dollar as compared to other crypto-collateralized stablecoins are presented in the following table:
 
 
 
