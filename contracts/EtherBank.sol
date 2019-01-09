@@ -47,7 +47,7 @@ contract EtherBank {
         LoanState state;
     }
 
-    mapping(uint256 => Loan) private loans;
+    mapping(uint256 => Loan) public loans;
 
     event LoanGot(address indexed recipient, uint256 indexed loanId, uint256 collateral, uint256 amount);
     event LoanSettled(address recipient, uint256 indexed loanId, uint256 collateral, uint256 amount);
@@ -237,9 +237,9 @@ contract EtherBank {
         checkLoanState(loanId, LoanState.UNDER_LIQUIDATION)
     {
         require (collateral <= loans[loanId].collateral, INVALID_AMOUNT);
-        loans[loanId].state = LoanState.LIQUIDATED;
         loans[loanId].collateral = loans[loanId].collateral.sub(collateral);
         loans[loanId].amount = 0;
+        loans[loanId].state = LoanState.LIQUIDATED;
         buyer.transfer(collateral);
     }
 
