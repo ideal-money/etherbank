@@ -55,6 +55,7 @@ The main advantages of Ether dollar as compared to other crypto-collateralized s
 ### More Information
 * [Advantages of Ether Dollar over Other Stablecoins](https://github.com/ideal-money/EtherBank/wiki/Advantages-of-Ether-Dollar-over-Other-Stablecoins)
 * [Why is Ether dollar the least likley stablecoin to lose the peg?](https://github.com/ideal-money/EtherBank/wiki/Why-is-Ether-dollar-the-least-likley-stablecoin-to-lose-the-peg%3F)
+* [Why Ether Bank When We Have MakerDAO?](https://medium.com/ideal-money/why-ether-bank-when-we-have-makerdao-45e9f5a17726)
 * [Technical Overview](https://github.com/ideal-money/EtherBank/wiki/Technical-Overview)
 
 ### Disclaimer
