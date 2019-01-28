@@ -54,7 +54,6 @@ contract EtherBank {
     event CollateralIncreased(address indexed recipient, uint256 indexed loanId, uint256 collateral);
     event CollateralDecreased(address indexed recipient, uint256 indexed loanId, uint256 collateral);
 
-    string private constant INVALID_ADDRESS = "INVALID_ADDRESS";
     string private constant INVALID_AMOUNT = "INVALID_AMOUNT";
     string private constant INITIALIZED_BEFORE = "INITIALIZED_BEFORE";
     string private constant SUFFICIENT_COLLATERAL = "SUFFICIENT_COLLATERAL";
