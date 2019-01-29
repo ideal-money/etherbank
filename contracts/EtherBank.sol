@@ -65,11 +65,11 @@ contract EtherBank {
     string private constant INVALID_LOAN_STATE = "INVALID_LOAN_STATE";
     string private constant EXCEEDED_MAX_LOAN = "EXCEEDED_MAX_LOAN";
 
-    constructor(address _tokenAdd)
+    constructor(address _tokenAddr)
         public
     {
-        token = EtherDollar(_tokenAdd);
-        etherDollarAddr = _tokenAdd;
+        token = EtherDollar(_tokenAddr);
+        etherDollarAddr = _tokenAddr;
         collateralRatio = 1500; // = 1.5 * PRECISION_POINT
         liquidationDuration = 7200; // = 2 hours
     }
