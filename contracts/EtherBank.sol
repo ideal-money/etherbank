@@ -34,6 +34,7 @@ contract EtherBank {
     }
 
     enum LoanState {
+        UNDEFINED,
         ACTIVE,
         UNDER_LIQUIDATION,
         LIQUIDATED,
